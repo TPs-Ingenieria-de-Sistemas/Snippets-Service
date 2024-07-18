@@ -3,6 +3,7 @@ package org.example.snippetservice.domains.snippet.controller;
 import jakarta.validation.Valid;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.UpdateSnippetDTO;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +50,7 @@ public class SnippetController {
     @PutMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @RequestBody String content) {
-        return this.snippetService.updateSnippet(userId, name, content);
+    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @RequestBody UpdateSnippetDTO content) {
+        return this.snippetService.updateSnippet(userId, name, content.content);
     }
 }

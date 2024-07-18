@@ -27,7 +27,6 @@ public class SnippetServiceImpl implements SnippetService {
     public SnippetDTO createSnippet(CreateSnippetDTO createSnippetDTO) {
         Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId, createSnippetDTO.name);
         if (snippetOptional.isPresent()) {
-            System.out.println("tira un error de que ya existe en la db");
             return null;
         }
 
@@ -37,10 +36,8 @@ public class SnippetServiceImpl implements SnippetService {
         snippet.setContent(createSnippetDTO.content);
 
         try {
-            System.out.println("entra aca");
             this.restTemplate.postForObject(assetServiceUrl + "snippet-" + createSnippetDTO.userId.toString() + "-" + createSnippetDTO.name, createSnippetDTO.content, String.class);
         } catch (Exception e) {
-            System.out.println("tira un error con el restTemplate");
             return null;
         }
 
