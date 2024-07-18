@@ -7,5 +7,5 @@ RUN ./gradlew bootJar
 FROM eclipse-temurin:17-jre-jammy
 EXPOSE 8080
 RUN mkdir /app
-COPY --from=build /app/build/libs/snippet-service-0.0.1-SNAPSHOT.jar /app/snippet-service.jar
+COPY --from=build /app/build/libs/snippet-service-*.jar /app/snippet-service.jar
 ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=production","/app/snippet-service.jar"]
