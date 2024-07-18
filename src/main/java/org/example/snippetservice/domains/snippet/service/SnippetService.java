@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface SnippetService {
-    SnippetDTO createSnippet(CreateSnippetDTO createSnippetDTO);
+    ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO);
     SnippetDTO getSnippet(Long id);
     String getSnippetByUserIdAndName(Long userId, String name);
     ResponseEntity<String> deleteSnippet(Long userId, String name);

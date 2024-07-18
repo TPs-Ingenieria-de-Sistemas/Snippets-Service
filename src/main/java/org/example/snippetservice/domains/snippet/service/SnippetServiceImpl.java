@@ -24,26 +24,30 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public SnippetDTO createSnippet(CreateSnippetDTO createSnippetDTO) {
+    public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO) {
+        //Check if the snippet already exists
         Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId, createSnippetDTO.name);
         if (snippetOptional.isPresent()) {
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
 
+        //Create the snippet
         Snippet snippet = new Snippet();
         snippet.setUserId(createSnippetDTO.userId);
         snippet.setName(createSnippetDTO.name);
         snippet.setContent(createSnippetDTO.content);
 
         try {
+            //Store in bucket
             this.restTemplate.postForObject(assetServiceUrl + "snippet-" + createSnippetDTO.userId.toString() + "-" + createSnippetDTO.name, createSnippetDTO.content, String.class);
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        //Store in database
         this.snippetRepository.save(snippet);
 
-        return new SnippetDTO(snippet);
+        return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
     }
 
     @Override
@@ -55,8 +59,10 @@ public class SnippetServiceImpl implements SnippetService {
     @Override
     public String getSnippetByUserIdAndName(Long userId, String name) {
         try {
+            //Check in database
             this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
             try {
+                //Get from bucket
                 return this.restTemplate.getForObject(assetServiceUrl + "snippet-" + userId.toString() + "-" + name, String.class);
             } catch (Exception e) {
                 return null;
@@ -69,9 +75,12 @@ public class SnippetServiceImpl implements SnippetService {
     @Override
     public ResponseEntity<String> deleteSnippet(Long userId, String name) {
         try {
+            //Check if snippet exists
             Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
             try {
+                //Delete from bucket
                 this.restTemplate.delete(assetServiceUrl + "snippet-" + userId.toString() + "-" + name);
+                //Delete from database
                 this.snippetRepository.delete(snippet);
             } catch (Exception e) {
                 return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
@@ -95,6 +104,7 @@ public class SnippetServiceImpl implements SnippetService {
     @Override
     public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String content) {
         try {
+            //Delete snippet and create new one with new content
             ResponseEntity<String> response = this.deleteSnippet(userId, name);
             if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -103,7 +113,7 @@ public class SnippetServiceImpl implements SnippetService {
             createSnippetDTO.userId = userId;
             createSnippetDTO.name = name;
             createSnippetDTO.content = content;
-            return new ResponseEntity<>(this.createSnippet(createSnippetDTO), HttpStatus.OK);
+            return this.createSnippet(createSnippetDTO);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }

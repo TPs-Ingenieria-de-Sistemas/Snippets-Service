@@ -23,11 +23,7 @@ public class SnippetController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<SnippetDTO> storeSnippet(@Valid @RequestBody CreateSnippetDTO snippet) {
-        SnippetDTO response = this.snippetService.createSnippet(snippet);
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        return this.snippetService.createSnippet(snippet);
     }
 
     @GetMapping("/{userId}/{name}")
