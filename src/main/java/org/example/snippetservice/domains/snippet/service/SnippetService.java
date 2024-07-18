@@ -12,4 +12,5 @@ public interface SnippetService {
     String getSnippetByUserIdAndName(Long userId, String name);
     ResponseEntity<String> deleteSnippet(Long userId, String name);
     List<SnippetDTO> getSnippets();
+    ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String content);
 }

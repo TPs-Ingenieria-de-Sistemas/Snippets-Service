@@ -1,14 +1,13 @@
-version: "3.9"
+version: "3"
 
 services:
 
   api:
-    container_name: "snippets-service"
+    container_name: "snippet-service"
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_DOCKER_SERVICE}:5432/${POSTGRES_DB}?connect_timeout=600
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}

@@ -17,7 +17,7 @@ import java.util.Optional;
 public class SnippetServiceImpl implements SnippetService {
     private final SnippetRepository snippetRepository;
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String assetServiceUrl = "http://localhost:8080/v1/asset/group-5/";
+    private final String assetServiceUrl = "http://asset_service:8080/v1/asset/group-5/";
 
     public SnippetServiceImpl(SnippetRepository snippetRepository) {
         this.snippetRepository = snippetRepository;
@@ -27,6 +27,7 @@ public class SnippetServiceImpl implements SnippetService {
     public SnippetDTO createSnippet(CreateSnippetDTO createSnippetDTO) {
         Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId, createSnippetDTO.name);
         if (snippetOptional.isPresent()) {
+            System.out.println("tira un error de que ya existe en la db");
             return null;
         }
 
@@ -36,8 +37,10 @@ public class SnippetServiceImpl implements SnippetService {
         snippet.setContent(createSnippetDTO.content);
 
         try {
+            System.out.println("entra aca");
             this.restTemplate.postForObject(assetServiceUrl + "snippet-" + createSnippetDTO.userId.toString() + "-" + createSnippetDTO.name, createSnippetDTO.content, String.class);
         } catch (Exception e) {
+            System.out.println("tira un error con el restTemplate");
             return null;
         }
 
@@ -90,5 +93,22 @@ public class SnippetServiceImpl implements SnippetService {
             result.add(new SnippetDTO(snippet));
         }
         return result;
+    }
+
+    @Override
+    public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String content) {
+        try {
+            ResponseEntity<String> response = this.deleteSnippet(userId, name);
+            if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            }
+            CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
+            createSnippetDTO.userId = userId;
+            createSnippetDTO.name = name;
+            createSnippetDTO.content = content;
+            return new ResponseEntity<>(this.createSnippet(createSnippetDTO), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 }

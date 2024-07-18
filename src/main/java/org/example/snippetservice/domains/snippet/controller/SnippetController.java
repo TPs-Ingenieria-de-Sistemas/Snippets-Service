@@ -45,4 +45,11 @@ public class SnippetController {
     public ResponseEntity<String> deleteSnippet(@PathVariable String name, @PathVariable Long userId) {
         return this.snippetService.deleteSnippet(userId, name);
     }
+
+    @PutMapping("/{userId}/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @RequestBody String content) {
+        return this.snippetService.updateSnippet(userId, name, content);
+    }
 }
