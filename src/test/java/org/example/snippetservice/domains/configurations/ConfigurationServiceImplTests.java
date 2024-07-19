@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
@@ -40,7 +41,7 @@ public class ConfigurationServiceImplTests {
     @Test
     public void createConfiguration_Conflict() {
         CreateConfigurationDTO dto = new CreateConfigurationDTO();
-        dto.userId = 1L;
+        dto.userId = UUID.randomUUID();
         dto.name = "config1";
         dto.content = "content";
 
@@ -53,7 +54,7 @@ public class ConfigurationServiceImplTests {
 
     @Test
     public void getConfiguration_InternalServerError() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "config1";
 
         when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.of(new Configuration()));
@@ -66,7 +67,7 @@ public class ConfigurationServiceImplTests {
 
     @Test
     public void updateConfiguration_NotFound() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "config1";
         String newName = "newConfig";
         String newContent = "newContent";
@@ -80,7 +81,7 @@ public class ConfigurationServiceImplTests {
 
     @Test
     public void deleteConfiguration_NotFound() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
 
         when(configurationRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
