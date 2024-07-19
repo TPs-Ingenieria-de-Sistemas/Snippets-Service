@@ -1,16 +1,14 @@
 package org.example.snippetservice.domains.snippet.controller;
 
 import jakarta.validation.Valid;
-import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
-import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
-import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
-import org.example.snippetservice.domains.snippet.dto.UpdateSnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.*;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/snippets")
@@ -63,10 +61,18 @@ public class SnippetController {
         return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null && !createSnippetDTO.language.isEmpty();
     }
 
-    @PutMapping("/{userId}/{name}/status")
+    @PutMapping("/status/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<String> updateSnippetStatus(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody SnippetStatus status) {
-        return this.snippetService.updateSnippetStatus(userId, name, status);
+    public ResponseEntity<String> updateSnippetStatus(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody SnippetStatusInputDTO status) {
+        if (Objects.equals(status.status, "PENDING")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.PENDING);
+        } else if (Objects.equals(status.status, "NOT_COMPLIANT")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.NOT_COMPLIANT);
+        } else if (Objects.equals(status.status, "COMPLIANT")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.COMPLIANT);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 }
