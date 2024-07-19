@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/snippets")
@@ -33,27 +34,27 @@ public class SnippetController {
     @GetMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<SnippetDTO> getSnippet(@PathVariable Long userId, @PathVariable String name) {
+    public ResponseEntity<SnippetDTO> getSnippet(@PathVariable UUID userId, @PathVariable String name) {
         return this.snippetService.getSnippetByUserIdAndName(userId, name);
     }
 
     @DeleteMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteSnippet(@PathVariable String name, @PathVariable Long userId) {
+    public ResponseEntity<String> deleteSnippet(@PathVariable String name, @PathVariable UUID userId) {
         return this.snippetService.deleteSnippet(userId, name);
     }
 
     @PutMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody UpdateSnippetDTO newSnippet) {
+    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable UUID userId, @PathVariable String name, @Valid @RequestBody UpdateSnippetDTO newSnippet) {
         return this.snippetService.updateSnippet(userId, name, newSnippet.newName, newSnippet.content);
     }
 
     @GetMapping("/by_user/{userId}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<List<SnippetDTO>> getUserSnippets(@PathVariable Long userId) {
+    public ResponseEntity<List<SnippetDTO>> getUserSnippets(@PathVariable UUID userId) {
         return new ResponseEntity<>(this.snippetService.getUserSnippets(userId), HttpStatus.OK);
     }
 
@@ -64,13 +65,15 @@ public class SnippetController {
     @PutMapping("/status/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<String> updateSnippetStatus(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody SnippetStatusInputDTO status) {
+    public ResponseEntity<String> updateSnippetStatus(@PathVariable UUID userId, @PathVariable String name, @Valid @RequestBody SnippetStatusInputDTO status) {
         if (Objects.equals(status.status, "PENDING")) {
             return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.PENDING);
         } else if (Objects.equals(status.status, "NOT_COMPLIANT")) {
             return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.NOT_COMPLIANT);
         } else if (Objects.equals(status.status, "COMPLIANT")) {
             return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.COMPLIANT);
+        } else if (Objects.equals(status.status, "FAILED")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.FAILED);
         } else {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }

@@ -5,8 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface SnippetRepository extends JpaRepository<Snippet, Long> {
-    Optional<Snippet> findByUserIdAndName(Long userId, String name);
-    List<Snippet> findAllByUserId(Long userId);
+    Optional<Snippet> findByUserIdAndName(UUID userId, String name);
+    List<Snippet> findAllByUserId(UUID userId);
 }

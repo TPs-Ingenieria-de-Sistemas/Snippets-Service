@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -44,7 +45,7 @@ public class SnippetServiceImplTests {
     @Test
     public void createSnippet_Conflict() {
         CreateSnippetDTO dto = new CreateSnippetDTO();
-        dto.userId = 1L;
+        dto.userId = UUID.randomUUID();
         dto.name = "Snippet Title";
         dto.content = "Snippet Content";
 
@@ -57,7 +58,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void getSnippet_NotFound() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -70,20 +71,21 @@ public class SnippetServiceImplTests {
     @Test
     public void updateSnippet_NotFound() {
         Long snippetId = 1L;
+        UUID userId = UUID.randomUUID();
         SnippetDTO dto = new SnippetDTO();
         dto.name = "Updated Title";
         dto.content = "Updated Content";
 
         when(snippetRepository.findById(snippetId)).thenReturn(Optional.empty());
 
-        ResponseEntity<SnippetDTO> response = snippetService.updateSnippet(snippetId, dto.name, "newName", dto.content);
+        ResponseEntity<SnippetDTO> response = snippetService.updateSnippet(userId, dto.name, "newName", dto.content);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     public void deleteSnippet_NotFound() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -95,7 +97,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void updateSnippetStatus() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -113,7 +115,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void getUserSnippets() {
-        Long userId = 1L;
+        UUID userId = UUID.randomUUID();
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());

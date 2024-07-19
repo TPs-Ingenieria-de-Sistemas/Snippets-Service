@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SnippetServiceImpl implements SnippetService {
@@ -63,7 +64,7 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(Long userId, String name) {
+    public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(UUID userId, String name) {
         try {
             //Check in database
             Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
@@ -89,7 +90,7 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public ResponseEntity<String> deleteSnippet(Long userId, String name) {
+    public ResponseEntity<String> deleteSnippet(UUID userId, String name) {
         try {
             //Check if snippet exists
             Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
@@ -108,7 +109,7 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public List<SnippetDTO> getUserSnippets(Long userId) {
+    public List<SnippetDTO> getUserSnippets(UUID userId) {
         List<Snippet> snippets = this.snippetRepository.findAllByUserId(userId);
         List<SnippetDTO> result = new ArrayList<>();
         for (Snippet snippet : snippets) {
@@ -118,7 +119,7 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String newName, String content) {
+    public ResponseEntity<SnippetDTO> updateSnippet(UUID userId, String name, String newName, String content) {
         try {
             //Get old content
             SnippetDTO oldContent = this.getSnippetByUserIdAndName(userId, name).getBody();
@@ -160,7 +161,7 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public ResponseEntity<String> updateSnippetStatus(Long userId, String name, SnippetStatus status) {
+    public ResponseEntity<String> updateSnippetStatus(UUID userId, String name, SnippetStatus status) {
         try {
             Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
             snippet.setStatus(status);

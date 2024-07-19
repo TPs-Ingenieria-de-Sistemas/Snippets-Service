@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,13 +36,13 @@ public class ConfigurationControllerTest {
     @Test
     public void testStoreConfiguration() {
         CreateConfigurationDTO createConfigurationDTO = new CreateConfigurationDTO();
-        createConfigurationDTO.userId = 1L;
+        createConfigurationDTO.userId = UUID.randomUUID();
         createConfigurationDTO.name = "testConfig";
         createConfigurationDTO.content = "content";
 
         ConfigurationDTO configurationDTO = new ConfigurationDTO();
         configurationDTO.id = 1L;
-        configurationDTO.userId = 1L;
+        configurationDTO.userId = createConfigurationDTO.userId;
         configurationDTO.name = "testConfig";
         configurationDTO.content = "content";
 
@@ -64,14 +65,14 @@ public class ConfigurationControllerTest {
         String content = "content";
         ConfigurationDTO configurationDTO = new ConfigurationDTO();
         configurationDTO.id = 1L;
-        configurationDTO.userId = 1L;
+        configurationDTO.userId = UUID.randomUUID();
         configurationDTO.name = "testConfig";
         configurationDTO.content = "content";
 
-        when(configurationService.getConfiguration(1L, "testConfig"))
+        when(configurationService.getConfiguration(configurationDTO.userId, "testConfig"))
                 .thenReturn(new ResponseEntity<>(configurationDTO, HttpStatus.OK));
 
-        ResponseEntity<ConfigurationDTO> response = configurationController.getConfiguration(1L, "testConfig");
+        ResponseEntity<ConfigurationDTO> response = configurationController.getConfiguration(configurationDTO.userId, "testConfig");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("content", Objects.requireNonNull(response.getBody()).content);
@@ -79,10 +80,11 @@ public class ConfigurationControllerTest {
 
     @Test
     public void testDeleteConfiguration() {
-        when(configurationService.deleteConfiguration(1L))
+        UUID userId = UUID.randomUUID();
+        when(configurationService.deleteConfiguration(userId))
                 .thenReturn(new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT));
 
-        ResponseEntity<String> response = configurationController.deleteConfiguration(1L);
+        ResponseEntity<String> response = configurationController.deleteConfiguration(userId);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertEquals("204 No Content", response.getBody());
@@ -96,14 +98,14 @@ public class ConfigurationControllerTest {
 
         ConfigurationDTO configurationDTO = new ConfigurationDTO();
         configurationDTO.id = 1L;
-        configurationDTO.userId = 1L;
+        configurationDTO.userId = UUID.randomUUID();
         configurationDTO.name = "updatedConfig";
         configurationDTO.content = "updated content";
 
-        when(configurationService.updateConfiguration(1L, "testConfig", updateConfigurationDTO.name, updateConfigurationDTO.content))
+        when(configurationService.updateConfiguration(configurationDTO.userId, "testConfig", updateConfigurationDTO.name, updateConfigurationDTO.content))
                 .thenReturn(new ResponseEntity<>(configurationDTO, HttpStatus.OK));
 
-        ResponseEntity<ConfigurationDTO> response = configurationController.updateConfiguration(1L, "testConfig", updateConfigurationDTO);
+        ResponseEntity<ConfigurationDTO> response = configurationController.updateConfiguration(configurationDTO.userId, "testConfig", updateConfigurationDTO);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());

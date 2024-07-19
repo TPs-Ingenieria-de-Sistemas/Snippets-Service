@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "snippet", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "name"})
@@ -14,7 +16,7 @@ public class Snippet {
     private Long id;
 
     @Column
-    private Long userId;
+    private UUID userId;
 
     @Column
     private String name;
@@ -32,7 +34,7 @@ public class Snippet {
         return id;
     }
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
@@ -48,7 +50,7 @@ public class Snippet {
         this.id = id;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
