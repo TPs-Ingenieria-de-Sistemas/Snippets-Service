@@ -2,6 +2,7 @@ package org.example.snippetservice.domains.snippet.model;
 
 import jakarta.persistence.*;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 
 @Entity
 @Table(name = "snippet", uniqueConstraints = {
@@ -20,6 +21,12 @@ public class Snippet {
 
     @Column
     private String content;
+
+    @Column
+    private String language;
+
+    @Column
+    private SnippetStatus status;
 
     public Long getId() {
         return id;
@@ -53,6 +60,22 @@ public class Snippet {
         this.content = content;
     }
 
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public SnippetStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(SnippetStatus status) {
+        this.status = status;
+    }
+
     public Snippet() {
     }
 
@@ -60,5 +83,6 @@ public class Snippet {
         this.userId = snippetDTO.userId;
         this.name = snippetDTO.name;
         this.content = snippetDTO.content;
+        this.language = snippetDTO.language;
     }
 }

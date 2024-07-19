@@ -17,6 +17,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 public class SnippetControllerTest {
 
     @InjectMocks
@@ -36,12 +38,14 @@ public class SnippetControllerTest {
         createSnippetDTO.userId = 1L;
         createSnippetDTO.name = "testSnippet";
         createSnippetDTO.content = "snippet content";
+        createSnippetDTO.language = "plaintext";
 
         SnippetDTO snippetDTO = new SnippetDTO();
         snippetDTO.id = 1L;
         snippetDTO.userId = 1L;
         snippetDTO.name = "testSnippet";
         snippetDTO.content = "snippet content";
+        snippetDTO.language = "plaintext";
 
         when(snippetService.createSnippet(createSnippetDTO, false))
                 .thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.CREATED));
@@ -56,13 +60,19 @@ public class SnippetControllerTest {
     @Test
     public void testGetSnippet() {
         String content = "snippet content";
-        when(snippetService.getSnippetByUserIdAndName(1L, "testSnippet"))
-                .thenReturn(content);
+        SnippetDTO snippetDTO = new SnippetDTO();
+        snippetDTO.id = 1L;
+        snippetDTO.userId = 1L;
+        snippetDTO.name = "testSnippet";
+        snippetDTO.content = content;
 
-        ResponseEntity<String> response = snippetController.getSnippet(1L, "testSnippet");
+        when(snippetService.getSnippetByUserIdAndName(1L, "testSnippet"))
+                .thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
+
+        ResponseEntity<SnippetDTO> response = snippetController.getSnippet(1L, "testSnippet");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("snippet content", response.getBody());
+        assertEquals("snippet content", Objects.requireNonNull(response.getBody()).content);
     }
 
     @Test

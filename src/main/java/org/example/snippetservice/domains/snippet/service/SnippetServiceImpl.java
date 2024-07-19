@@ -2,6 +2,7 @@ package org.example.snippetservice.domains.snippet.service;
 
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 import org.example.snippetservice.domains.snippet.model.Snippet;
 import org.example.snippetservice.domains.snippet.repository.SnippetRepository;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ public class SnippetServiceImpl implements SnippetService {
         snippet.setUserId(createSnippetDTO.userId);
         snippet.setName(createSnippetDTO.name);
         snippet.setContent(createSnippetDTO.content);
+        snippet.setLanguage(createSnippetDTO.language);
 
         try {
             //Store in bucket
@@ -61,27 +63,28 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public String getSnippetByUserIdAndName(Long userId, String name) {
+    public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(Long userId, String name) {
         try {
             //Check in database
-            this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+            Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
             try {
                 //Check permission
                 ResponseEntity<Boolean> hasPermission = this.restTemplate.getForEntity(permitsUrl + userId + "/" + name + "?permissions=R", Boolean.class);
                 if (Boolean.FALSE.equals(hasPermission.getBody())) {
-                    return null;
+                    return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
                 }
             } catch (Exception e) {
-                return null;
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
             }
             try {
                 //Get from bucket
-                return this.restTemplate.getForObject(assetServiceUrl + "snippet-" + userId.toString() + "-" + name, String.class);
+                this.restTemplate.getForObject(assetServiceUrl + "snippet-" + userId.toString() + "-" + name, String.class);
+                return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.OK);
             } catch (Exception e) {
-                return null;
+                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -118,7 +121,7 @@ public class SnippetServiceImpl implements SnippetService {
     public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String newName, String content) {
         try {
             //Get old content
-            String oldContent = this.getSnippetByUserIdAndName(userId, name);
+            SnippetDTO oldContent = this.getSnippetByUserIdAndName(userId, name).getBody();
             if (oldContent == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
@@ -139,7 +142,8 @@ public class SnippetServiceImpl implements SnippetService {
             CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
             createSnippetDTO.userId = userId;
             createSnippetDTO.name = name;
-            createSnippetDTO.content = oldContent;
+            createSnippetDTO.content = oldContent.content;
+            createSnippetDTO.language = oldContent.language;
 
             //Update name and content if new values are provided
             if (newName != null) {
@@ -153,5 +157,18 @@ public class SnippetServiceImpl implements SnippetService {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override
+    public ResponseEntity<String> updateSnippetStatus(Long userId, String name, SnippetStatus status) {
+        try {
+            Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+            snippet.setStatus(status);
+            this.snippetRepository.save(snippet);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("200 OK", HttpStatus.OK);
     }
 }

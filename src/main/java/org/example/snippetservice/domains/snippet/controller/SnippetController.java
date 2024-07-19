@@ -3,6 +3,7 @@ package org.example.snippetservice.domains.snippet.controller;
 import jakarta.validation.Valid;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 import org.example.snippetservice.domains.snippet.dto.UpdateSnippetDTO;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
 import org.springframework.http.HttpStatus;
@@ -34,12 +35,8 @@ public class SnippetController {
     @GetMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<String> getSnippet(@PathVariable Long userId, @PathVariable String name) {
-        String response = this.snippetService.getSnippetByUserIdAndName(userId, name);
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public ResponseEntity<SnippetDTO> getSnippet(@PathVariable Long userId, @PathVariable String name) {
+        return this.snippetService.getSnippetByUserIdAndName(userId, name);
     }
 
     @DeleteMapping("/{userId}/{name}")
@@ -63,6 +60,13 @@ public class SnippetController {
     }
 
     private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
-        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty();
+        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null && !createSnippetDTO.language.isEmpty();
+    }
+
+    @PutMapping("/{userId}/{name}/status")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<String> updateSnippetStatus(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody SnippetStatus status) {
+        return this.snippetService.updateSnippetStatus(userId, name, status);
     }
 }

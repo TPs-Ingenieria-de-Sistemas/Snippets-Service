@@ -13,6 +13,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -56,13 +58,19 @@ public class ConfigurationControllerTest {
     @Test
     public void testGetConfiguration() {
         String content = "content";
-        when(configurationService.getConfiguration(1L, "testConfig"))
-                .thenReturn(new ResponseEntity<>(content, HttpStatus.OK));
+        ConfigurationDTO configurationDTO = new ConfigurationDTO();
+        configurationDTO.id = 1L;
+        configurationDTO.userId = 1L;
+        configurationDTO.name = "testConfig";
+        configurationDTO.content = "content";
 
-        ResponseEntity<String> response = configurationController.getConfiguration(1L, "testConfig");
+        when(configurationService.getConfiguration(1L, "testConfig"))
+                .thenReturn(new ResponseEntity<>(configurationDTO, HttpStatus.OK));
+
+        ResponseEntity<ConfigurationDTO> response = configurationController.getConfiguration(1L, "testConfig");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("content", response.getBody());
+        assertEquals("content", Objects.requireNonNull(response.getBody()).content);
     }
 
     @Test
