@@ -59,7 +59,7 @@ public class ConfigurationServiceImplTests {
         when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.of(new Configuration()));
         doThrow(new RuntimeException()).when(restTemplate).getForObject(anyString(), any());
 
-        ResponseEntity<String> response = configurationService.getConfiguration(userId, name);
+        ResponseEntity<ConfigurationDTO> response = configurationService.getConfiguration(userId, name);
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }

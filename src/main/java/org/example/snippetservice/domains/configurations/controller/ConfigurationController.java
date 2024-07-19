@@ -31,7 +31,7 @@ public class ConfigurationController {
     @GetMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<String> getConfiguration(@PathVariable Long userId, @PathVariable String name) {
+    public ResponseEntity<ConfigurationDTO> getConfiguration(@PathVariable Long userId, @PathVariable String name) {
         return this.configurationService.getConfiguration(userId, name);
     }
 

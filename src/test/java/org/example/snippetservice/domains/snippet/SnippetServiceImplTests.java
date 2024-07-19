@@ -60,9 +60,9 @@ public class SnippetServiceImplTests {
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
-        String response = snippetService.getSnippetByUserIdAndName(userId, name);
+        ResponseEntity<SnippetDTO> response = snippetService.getSnippetByUserIdAndName(userId, name);
 
-        assertNull(response);
+        assertNull(response.getBody());
     }
 
     @Test

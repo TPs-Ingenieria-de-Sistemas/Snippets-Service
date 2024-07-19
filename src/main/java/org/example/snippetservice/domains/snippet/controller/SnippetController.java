@@ -1,15 +1,14 @@
 package org.example.snippetservice.domains.snippet.controller;
 
 import jakarta.validation.Valid;
-import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
-import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
-import org.example.snippetservice.domains.snippet.dto.UpdateSnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.*;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/snippets")
@@ -34,12 +33,8 @@ public class SnippetController {
     @GetMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<String> getSnippet(@PathVariable Long userId, @PathVariable String name) {
-        String response = this.snippetService.getSnippetByUserIdAndName(userId, name);
-        if (response != null) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public ResponseEntity<SnippetDTO> getSnippet(@PathVariable Long userId, @PathVariable String name) {
+        return this.snippetService.getSnippetByUserIdAndName(userId, name);
     }
 
     @DeleteMapping("/{userId}/{name}")
@@ -63,6 +58,21 @@ public class SnippetController {
     }
 
     private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
-        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty();
+        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null && !createSnippetDTO.language.isEmpty();
+    }
+
+    @PutMapping("/status/{userId}/{name}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<String> updateSnippetStatus(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody SnippetStatusInputDTO status) {
+        if (Objects.equals(status.status, "PENDING")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.PENDING);
+        } else if (Objects.equals(status.status, "NOT_COMPLIANT")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.NOT_COMPLIANT);
+        } else if (Objects.equals(status.status, "COMPLIANT")) {
+            return this.snippetService.updateSnippetStatus(userId, name, SnippetStatus.COMPLIANT);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
     }
 }

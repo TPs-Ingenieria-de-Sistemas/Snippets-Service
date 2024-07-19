@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -45,11 +46,12 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     }
 
     @Override
-    public ResponseEntity<String> getConfiguration(Long userId, String name) {
+    public ResponseEntity<ConfigurationDTO> getConfiguration(Long userId, String name) {
         try {
-            this.configurationRepository.findByUserIdAndName(userId, name).orElseThrow();
+            Configuration configuration = this.configurationRepository.findByUserIdAndName(userId, name).orElseThrow();
             try{
-                return new ResponseEntity<>(this.restTemplate.getForObject(assetServiceUrl + "configuration-" + userId.toString() + "-" + name, String.class), HttpStatus.OK);
+                this.restTemplate.getForObject(assetServiceUrl + "configuration-" + userId.toString() + "-" + name, String.class);
+                return new ResponseEntity<>(new ConfigurationDTO(configuration), HttpStatus.OK);
             }
             catch (Exception e) {
                 return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -64,7 +66,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     public ResponseEntity<ConfigurationDTO> updateConfiguration(Long userId, String name, String newName, String newContent) {
         try {
             //Get old content
-            String oldContent = this.getConfiguration(userId, name).getBody();
+            ConfigurationDTO oldContent = this.getConfiguration(userId, name).getBody();
             if (oldContent == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
@@ -74,7 +76,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
             CreateConfigurationDTO createConfigurationDTO = new CreateConfigurationDTO();
             createConfigurationDTO.userId = userId;
             createConfigurationDTO.name = name;
-            createConfigurationDTO.content = oldContent;
+            createConfigurationDTO.content = oldContent.content;
 
             if (newName != null) {
                 createConfigurationDTO.name = newName;

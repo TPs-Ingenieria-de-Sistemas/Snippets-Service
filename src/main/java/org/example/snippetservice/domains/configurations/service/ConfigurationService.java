@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface ConfigurationService {
     ResponseEntity<ConfigurationDTO> createConfiguration(CreateConfigurationDTO createConfigurationDTO);
-    ResponseEntity<String> getConfiguration(Long userId, String name);
+    ResponseEntity<ConfigurationDTO> getConfiguration(Long userId, String name);
     ResponseEntity<ConfigurationDTO> updateConfiguration(Long userId, String name, String newName, String newContent);
     ResponseEntity<String> deleteConfiguration(Long userId);
 }
