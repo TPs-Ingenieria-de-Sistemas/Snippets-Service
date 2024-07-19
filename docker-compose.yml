@@ -13,6 +13,9 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
+      AUTH0_API: ${AUTH0_API}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      PORT: ${PORT}
     ports:
       - "8081:8081"
     volumes:

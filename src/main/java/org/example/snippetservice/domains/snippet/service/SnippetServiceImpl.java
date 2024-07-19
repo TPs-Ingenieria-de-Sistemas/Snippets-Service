@@ -18,13 +18,14 @@ public class SnippetServiceImpl implements SnippetService {
     private final SnippetRepository snippetRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final String assetServiceUrl = "http://asset_service:8080/v1/asset/group-5/";
+    private final String permitsUrl = "http://snippet-permit:8080/";
 
     public SnippetServiceImpl(SnippetRepository snippetRepository) {
         this.snippetRepository = snippetRepository;
     }
 
     @Override
-    public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO) {
+    public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Boolean isUpdating) {
         //Check if the snippet already exists
         Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId, createSnippetDTO.name);
         if (snippetOptional.isPresent()) {
@@ -47,13 +48,16 @@ public class SnippetServiceImpl implements SnippetService {
         //Store in database
         this.snippetRepository.save(snippet);
 
-        return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
-    }
+        if (!isUpdating) {
+            try {
+                //Create permit
+                this.restTemplate.postForObject(permitsUrl + "manage/as-owner/" + snippet.getName(), null, String.class);
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
-    @Override
-    public SnippetDTO getSnippet(Long id) {
-        Snippet snippet = this.snippetRepository.findById(id).orElseThrow();
-        return new SnippetDTO(snippet);
+        return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
     }
 
     @Override
@@ -61,6 +65,15 @@ public class SnippetServiceImpl implements SnippetService {
         try {
             //Check in database
             this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+            try {
+                //Check permission
+                ResponseEntity<Boolean> hasPermission = this.restTemplate.getForEntity(permitsUrl + userId + "/" + name + "?permissions=R", Boolean.class);
+                if (Boolean.FALSE.equals(hasPermission.getBody())) {
+                    return null;
+                }
+            } catch (Exception e) {
+                return null;
+            }
             try {
                 //Get from bucket
                 return this.restTemplate.getForObject(assetServiceUrl + "snippet-" + userId.toString() + "-" + name, String.class);
@@ -92,8 +105,8 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public List<SnippetDTO> getSnippets() {
-        List<Snippet> snippets = this.snippetRepository.findAll();
+    public List<SnippetDTO> getUserSnippets(Long userId) {
+        List<Snippet> snippets = this.snippetRepository.findAllByUserId(userId);
         List<SnippetDTO> result = new ArrayList<>();
         for (Snippet snippet : snippets) {
             result.add(new SnippetDTO(snippet));
@@ -102,18 +115,41 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
-    public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String content) {
+    public ResponseEntity<SnippetDTO> updateSnippet(Long userId, String name, String newName, String content) {
         try {
-            //Delete snippet and create new one with new content
-            ResponseEntity<String> response = this.deleteSnippet(userId, name);
-            if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
+            //Get old content
+            String oldContent = this.getSnippetByUserIdAndName(userId, name);
+            if (oldContent == null) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }
+
+            try {
+                //Check permission
+                ResponseEntity<Boolean> hasPermission = this.restTemplate.getForEntity(permitsUrl + userId + "/" + name + "?permissions=W", Boolean.class);
+                if (Boolean.FALSE.equals(hasPermission.getBody())) {
+                    return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+                }
+            } catch (Exception e) {
+                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+            }
+
+            //Delete snippet and create new one with new content
+            this.deleteSnippet(userId, name);
+
             CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
             createSnippetDTO.userId = userId;
             createSnippetDTO.name = name;
-            createSnippetDTO.content = content;
-            return this.createSnippet(createSnippetDTO);
+            createSnippetDTO.content = oldContent;
+
+            //Update name and content if new values are provided
+            if (newName != null) {
+                createSnippetDTO.name = newName;
+            }
+            if (content != null) {
+                createSnippetDTO.content = content;
+            }
+
+            return this.createSnippet(createSnippetDTO, true);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
