@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/snippets/configurations")
 public class ConfigurationController {
@@ -31,20 +33,20 @@ public class ConfigurationController {
     @GetMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<ConfigurationDTO> getConfiguration(@PathVariable Long userId, @PathVariable String name) {
+    public ResponseEntity<ConfigurationDTO> getConfiguration(@PathVariable UUID userId, @PathVariable String name) {
         return this.configurationService.getConfiguration(userId, name);
     }
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> deleteConfiguration(@PathVariable Long userId) {
+    public ResponseEntity<String> deleteConfiguration(@PathVariable UUID userId) {
         return this.configurationService.deleteConfiguration(userId);
     }
 
     @PutMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<ConfigurationDTO> updateConfiguration(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody UpdateConfigurationDTO newConfiguration) {
+    public ResponseEntity<ConfigurationDTO> updateConfiguration(@PathVariable UUID userId, @PathVariable String name, @Valid @RequestBody UpdateConfigurationDTO newConfiguration) {
         return this.configurationService.updateConfiguration(userId, name, newConfiguration.name, newConfiguration.content);
     }
 

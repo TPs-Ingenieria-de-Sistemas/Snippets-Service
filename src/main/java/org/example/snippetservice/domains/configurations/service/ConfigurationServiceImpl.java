@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.swing.text.html.Option;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ConfigurationServiceImpl implements ConfigurationService{
@@ -46,7 +47,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     }
 
     @Override
-    public ResponseEntity<ConfigurationDTO> getConfiguration(Long userId, String name) {
+    public ResponseEntity<ConfigurationDTO> getConfiguration(UUID userId, String name) {
         try {
             Configuration configuration = this.configurationRepository.findByUserIdAndName(userId, name).orElseThrow();
             try{
@@ -63,7 +64,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     }
 
     @Override
-    public ResponseEntity<ConfigurationDTO> updateConfiguration(Long userId, String name, String newName, String newContent) {
+    public ResponseEntity<ConfigurationDTO> updateConfiguration(UUID userId, String name, String newName, String newContent) {
         try {
             //Get old content
             ConfigurationDTO oldContent = this.getConfiguration(userId, name).getBody();
@@ -93,7 +94,7 @@ public class ConfigurationServiceImpl implements ConfigurationService{
     }
 
     @Override
-    public ResponseEntity<String> deleteConfiguration(Long userId) {
+    public ResponseEntity<String> deleteConfiguration(UUID userId) {
         try {
             Configuration configuration = this.configurationRepository.findByUserId(userId).orElseThrow();
             try {
