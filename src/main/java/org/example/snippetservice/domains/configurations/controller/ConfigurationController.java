@@ -22,7 +22,7 @@ public class ConfigurationController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<ConfigurationDTO> storeConfiguration(@Valid @RequestBody CreateConfigurationDTO configuration) {
-        if (!validateCreateSnippetDTO(configuration)) {
+        if (!validateCreateConfigurationDTO(configuration)) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
         return this.configurationService.createConfiguration(configuration);
@@ -48,7 +48,7 @@ public class ConfigurationController {
         return this.configurationService.updateConfiguration(userId, name, newConfiguration.name, newConfiguration.content);
     }
 
-    private boolean validateCreateSnippetDTO(CreateConfigurationDTO createConfigurationDTO) {
+    private boolean validateCreateConfigurationDTO(CreateConfigurationDTO createConfigurationDTO) {
         return createConfigurationDTO.userId != null && createConfigurationDTO.name != null && createConfigurationDTO.content != null && !createConfigurationDTO.name.isEmpty();
     }
 }

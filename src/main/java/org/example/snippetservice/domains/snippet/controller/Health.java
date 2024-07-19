@@ -10,10 +10,4 @@ public class Health {
     public String health() {
         return "OK";
     }
-
-    public void storeSnippet() {
-        RestTemplate restTemplate = new RestTemplate();
-        String response = restTemplate.postForObject("http://localhost:8080/v1/", "snippet", String.class);
-        System.out.println(response);
-    }
 }

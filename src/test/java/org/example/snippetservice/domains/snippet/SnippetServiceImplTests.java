@@ -2,6 +2,7 @@ package org.example.snippetservice.domains.snippet;
 
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 import org.example.snippetservice.domains.snippet.model.Snippet;
 import org.example.snippetservice.domains.snippet.repository.SnippetRepository;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.mockito.Mockito.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,5 +91,47 @@ public class SnippetServiceImplTests {
         ResponseEntity<String> response = snippetService.deleteSnippet(userId, name);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void updateSnippetStatus() {
+        Long userId = 1L;
+        String name = "Snippet Title";
+
+        when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = snippetService.updateSnippetStatus(userId, name, SnippetStatus.PENDING);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.of(new Snippet()));
+
+        response = snippetService.updateSnippetStatus(userId, name, SnippetStatus.PENDING);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void getUserSnippets() {
+        Long userId = 1L;
+        String name = "Snippet Title";
+
+        when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
+
+        List<SnippetDTO> response = snippetService.getUserSnippets(userId);
+
+        assertEquals(0, response.size());
+
+        Snippet snippet = new Snippet();
+        snippet.setUserId(userId);
+        snippet.setName(name);
+        snippet.setContent("Snippet Content");
+        snippet.setLanguage("Java");
+
+        when(snippetRepository.findAllByUserId(userId)).thenReturn(List.of(snippet));
+
+        response = snippetService.getUserSnippets(userId);
+
+        assertEquals(1, response.size());
     }
 }
