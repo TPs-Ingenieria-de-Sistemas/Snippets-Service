@@ -53,6 +53,10 @@ public class ConfigurationControllerTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("testConfig", response.getBody().name);
+
+        createConfigurationDTO.name = null;
+        response = configurationController.storeConfiguration(createConfigurationDTO);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
