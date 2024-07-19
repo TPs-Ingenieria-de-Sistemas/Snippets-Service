@@ -7,6 +7,8 @@ public class SnippetDTO {
     public Long userId;
     public String name;
     public String content;
+    public String language;
+    public SnippetStatus status;
 
     public SnippetDTO() {
     }
@@ -16,6 +18,7 @@ public class SnippetDTO {
         this.userId = snippet.getUserId();
         this.name = snippet.getName();
         this.content = snippet.getContent();
+        this.language = snippet.getLanguage();
+        this.status = snippet.getStatus();
     }
 }
-
