@@ -27,7 +27,7 @@ public class Snippet {
 
     @Column
     private SnippetStatus status;
-
+  
     public Long getId() {
         return id;
     }
@@ -75,7 +75,7 @@ public class Snippet {
     public void setStatus(SnippetStatus status) {
         this.status = status;
     }
-
+  
     public Snippet() {
     }
 
