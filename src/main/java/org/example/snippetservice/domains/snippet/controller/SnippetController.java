@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/snippets")
 public class SnippetController {
@@ -23,7 +25,10 @@ public class SnippetController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public ResponseEntity<SnippetDTO> storeSnippet(@Valid @RequestBody CreateSnippetDTO snippet) {
-        return this.snippetService.createSnippet(snippet);
+        if (!validateCreateSnippetDTO(snippet)) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return this.snippetService.createSnippet(snippet, false);
     }
 
     @GetMapping("/{userId}/{name}")
@@ -46,7 +51,18 @@ public class SnippetController {
     @PutMapping("/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @RequestBody UpdateSnippetDTO content) {
-        return this.snippetService.updateSnippet(userId, name, content.content);
+    public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long userId, @PathVariable String name, @Valid @RequestBody UpdateSnippetDTO newSnippet) {
+        return this.snippetService.updateSnippet(userId, name, newSnippet.newName, newSnippet.content);
+    }
+
+    @GetMapping("/by_user/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public ResponseEntity<List<SnippetDTO>> getUserSnippets(@PathVariable Long userId) {
+        return new ResponseEntity<>(this.snippetService.getUserSnippets(userId), HttpStatus.OK);
+    }
+
+    private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
+        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty();
     }
 }
