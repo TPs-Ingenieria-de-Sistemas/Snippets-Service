@@ -3,6 +3,8 @@ package org.example.snippetservice.domains.configurations.model;
 import jakarta.persistence.*;
 import org.example.snippetservice.domains.configurations.dto.CreateConfigurationDTO;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "configuration", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id"})
@@ -13,7 +15,7 @@ public class Configuration {
     private Long id;
 
     @Column(unique = true)
-    private Long userId;
+    private UUID userId;
 
     @Column
     private String name;
@@ -25,7 +27,7 @@ public class Configuration {
         return id;
     }
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
@@ -41,7 +43,7 @@ public class Configuration {
         this.id = id;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
