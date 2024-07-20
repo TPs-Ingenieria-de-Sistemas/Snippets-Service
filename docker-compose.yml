@@ -16,6 +16,7 @@ services:
       AUTH0_API: ${AUTH0_API}
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       PORT: ${PORT}
+      PERMIT_PORT: ${PERMIT_PORT}
     ports:
       - "8081:8081"
     volumes:

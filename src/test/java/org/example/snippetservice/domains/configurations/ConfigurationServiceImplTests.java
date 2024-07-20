@@ -1,5 +1,12 @@
 package org.example.snippetservice.domains.configurations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+import java.util.UUID;
 import org.example.snippetservice.domains.configurations.dto.ConfigurationDTO;
 import org.example.snippetservice.domains.configurations.dto.CreateConfigurationDTO;
 import org.example.snippetservice.domains.configurations.model.Configuration;
@@ -14,79 +21,72 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
 public class ConfigurationServiceImplTests {
 
-    @InjectMocks
-    private ConfigurationServiceImpl configurationService;
+	@InjectMocks
+	private ConfigurationServiceImpl configurationService;
 
-    @Mock
-    private ConfigurationRepository configurationRepository;
+	@Mock
+	private ConfigurationRepository configurationRepository;
 
-    @Mock
-    private RestTemplate restTemplate;
+	@Mock
+	private RestTemplate restTemplate;
 
-    @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+	@BeforeEach
+	public void setUp() {
+		MockitoAnnotations.openMocks(this);
+	}
 
-    @Test
-    public void createConfiguration_Conflict() {
-        CreateConfigurationDTO dto = new CreateConfigurationDTO();
-        dto.userId = UUID.randomUUID();
-        dto.name = "config1";
-        dto.content = "content";
+	@Test
+	public void createConfiguration_Conflict() {
+		CreateConfigurationDTO dto = new CreateConfigurationDTO();
+		dto.userId = UUID.randomUUID();
+		dto.name = "config1";
+		dto.content = "content";
 
-        when(configurationRepository.findByUserId(dto.userId)).thenReturn(Optional.of(new Configuration()));
+		when(configurationRepository.findByUserId(dto.userId)).thenReturn(Optional.of(new Configuration()));
 
-        ResponseEntity<ConfigurationDTO> response = configurationService.createConfiguration(dto);
+		ResponseEntity<ConfigurationDTO> response = configurationService.createConfiguration(dto);
 
-        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-    }
+		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+	}
 
-    @Test
-    public void getConfiguration_InternalServerError() {
-        UUID userId = UUID.randomUUID();
-        String name = "config1";
+	@Test
+	public void getConfiguration_InternalServerError() {
+		UUID userId = UUID.randomUUID();
+		String name = "config1";
 
-        when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.of(new Configuration()));
-        doThrow(new RuntimeException()).when(restTemplate).getForObject(anyString(), any());
+		when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.of(new Configuration()));
+		doThrow(new RuntimeException()).when(restTemplate).getForObject(anyString(), any());
 
-        ResponseEntity<ConfigurationDTO> response = configurationService.getConfiguration(userId, name);
+		ResponseEntity<ConfigurationDTO> response = configurationService.getConfiguration(userId, name);
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    }
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+	}
 
-    @Test
-    public void updateConfiguration_NotFound() {
-        UUID userId = UUID.randomUUID();
-        String name = "config1";
-        String newName = "newConfig";
-        String newContent = "newContent";
+	@Test
+	public void updateConfiguration_NotFound() {
+		UUID userId = UUID.randomUUID();
+		String name = "config1";
+		String newName = "newConfig";
+		String newContent = "newContent";
 
-        when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
+		when(configurationRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
-        ResponseEntity<ConfigurationDTO> response = configurationService.updateConfiguration(userId, name, newName, newContent);
+		ResponseEntity<ConfigurationDTO> response = configurationService.updateConfiguration(userId, name, newName,
+				newContent);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
 
-    @Test
-    public void deleteConfiguration_NotFound() {
-        UUID userId = UUID.randomUUID();
+	@Test
+	public void deleteConfiguration_NotFound() {
+		UUID userId = UUID.randomUUID();
 
-        when(configurationRepository.findByUserId(userId)).thenReturn(Optional.empty());
+		when(configurationRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
-        ResponseEntity<String> response = configurationService.deleteConfiguration(userId);
+		ResponseEntity<String> response = configurationService.deleteConfiguration(userId);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
 }
