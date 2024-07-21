@@ -16,7 +16,8 @@ services:
       AUTH0_API: ${AUTH0_API}
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       PORT: ${PORT}
-      PERMIT_PORT: ${PERMIT_PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
       - "8081:8081"
     volumes:
@@ -60,6 +61,12 @@ services:
       - db-data:/var/lib/postgresql/data
     env_file:
       - .env
+
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
 
 volumes:
   blob:

@@ -39,12 +39,12 @@ public class SnippetServiceImplTests {
 		MockitoAnnotations.openMocks(this);
 	}
 
-	@Test
-	public void createSnippet_Conflict() {
-		CreateSnippetDTO dto = new CreateSnippetDTO();
-		dto.userId = UUID.randomUUID();
-		dto.name = "Snippet Title";
-		dto.content = "Snippet Content";
+    @Test
+    public void createSnippet_Conflict() {
+        CreateSnippetDTO dto = new CreateSnippetDTO();
+        dto.userId = "550e8400-e29b-41d4-a716-446655440000";
+        dto.name = "Snippet Title";
+        dto.content = "Snippet Content";
 
 		when(snippetRepository.findByUserIdAndName(dto.userId, dto.name)).thenReturn(Optional.of(new Snippet()));
 
@@ -53,10 +53,10 @@ public class SnippetServiceImplTests {
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 	}
 
-	@Test
-	public void getSnippet_NotFound() {
-		UUID userId = UUID.randomUUID();
-		String name = "Snippet Title";
+    @Test
+    public void getSnippet_NotFound() {
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
+        String name = "Snippet Title";
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
@@ -65,13 +65,13 @@ public class SnippetServiceImplTests {
 		assertNull(response.getBody());
 	}
 
-	@Test
-	public void updateSnippet_NotFound() {
-		Long snippetId = 1L;
-		UUID userId = UUID.randomUUID();
-		SnippetDTO dto = new SnippetDTO();
-		dto.name = "Updated Title";
-		dto.content = "Updated Content";
+    @Test
+    public void updateSnippet_NotFound() {
+        Long snippetId = 1L;
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
+        SnippetDTO dto = new SnippetDTO();
+        dto.name = "Updated Title";
+        dto.content = "Updated Content";
 
 		when(snippetRepository.findById(snippetId)).thenReturn(Optional.empty());
 
@@ -80,10 +80,10 @@ public class SnippetServiceImplTests {
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
 
-	@Test
-	public void deleteSnippet_NotFound() {
-		UUID userId = UUID.randomUUID();
-		String name = "Snippet Title";
+    @Test
+    public void deleteSnippet_NotFound() {
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
+        String name = "Snippet Title";
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
@@ -92,10 +92,10 @@ public class SnippetServiceImplTests {
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
 
-	@Test
-	public void updateSnippetStatus() {
-		UUID userId = UUID.randomUUID();
-		String name = "Snippet Title";
+    @Test
+    public void updateSnippetStatus() {
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
+        String name = "Snippet Title";
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
@@ -110,10 +110,10 @@ public class SnippetServiceImplTests {
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 
-	@Test
-	public void getUserSnippets() {
-		UUID userId = UUID.randomUUID();
-		String name = "Snippet Title";
+    @Test
+    public void getUserSnippets() {
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
+        String name = "Snippet Title";
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
