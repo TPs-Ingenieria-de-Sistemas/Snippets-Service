@@ -10,9 +10,9 @@ import java.util.UUID;
 
 public interface SnippetService {
     ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Boolean isUpdating);
-    ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(UUID userId, String name);
-    ResponseEntity<String> deleteSnippet(UUID userId, String name);
-    List<SnippetDTO> getUserSnippets(UUID userId);
-    ResponseEntity<SnippetDTO> updateSnippet(UUID userId, String name, String newName, String content);
-    ResponseEntity<String> updateSnippetStatus(UUID userId, String name, SnippetStatus status);
+    ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name);
+    ResponseEntity<String> deleteSnippet(String userId, String name);
+    List<SnippetDTO> getUserSnippets(String userId);
+    ResponseEntity<SnippetDTO> updateSnippet(String userId, String name, String newName, String content);
+    ResponseEntity<String> updateSnippetStatus(String userId, String name, SnippetStatus status);
 }

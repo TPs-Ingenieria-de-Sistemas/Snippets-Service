@@ -45,7 +45,7 @@ public class SnippetServiceImplTests {
     @Test
     public void createSnippet_Conflict() {
         CreateSnippetDTO dto = new CreateSnippetDTO();
-        dto.userId = UUID.randomUUID();
+        dto.userId = "550e8400-e29b-41d4-a716-446655440000";
         dto.name = "Snippet Title";
         dto.content = "Snippet Content";
 
@@ -58,7 +58,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void getSnippet_NotFound() {
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -71,7 +71,7 @@ public class SnippetServiceImplTests {
     @Test
     public void updateSnippet_NotFound() {
         Long snippetId = 1L;
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         SnippetDTO dto = new SnippetDTO();
         dto.name = "Updated Title";
         dto.content = "Updated Content";
@@ -85,7 +85,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void deleteSnippet_NotFound() {
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -97,7 +97,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void updateSnippetStatus() {
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
@@ -115,7 +115,7 @@ public class SnippetServiceImplTests {
 
     @Test
     public void getUserSnippets() {
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         String name = "Snippet Title";
 
         when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());

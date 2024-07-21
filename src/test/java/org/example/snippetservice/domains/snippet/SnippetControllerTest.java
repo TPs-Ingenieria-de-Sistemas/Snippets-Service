@@ -35,7 +35,7 @@ public class SnippetControllerTest {
     @Test
     public void testCreateSnippet() {
         CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-        createSnippetDTO.userId = UUID.randomUUID();
+        createSnippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
         createSnippetDTO.name = "testSnippet";
         createSnippetDTO.content = "snippet content";
         createSnippetDTO.language = "plaintext";
@@ -62,7 +62,7 @@ public class SnippetControllerTest {
         String content = "snippet content";
         SnippetDTO snippetDTO = new SnippetDTO();
         snippetDTO.id = 1L;
-        snippetDTO.userId = UUID.randomUUID();
+        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
         snippetDTO.name = "testSnippet";
         snippetDTO.content = content;
 
@@ -83,7 +83,7 @@ public class SnippetControllerTest {
 
         SnippetDTO snippetDTO = new SnippetDTO();
         snippetDTO.id = 1L;
-        snippetDTO.userId = UUID.randomUUID();
+        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
         snippetDTO.name = "updatedSnippet";
         snippetDTO.content = "updated content";
 
@@ -99,7 +99,7 @@ public class SnippetControllerTest {
 
     @Test
     public void testDeleteSnippet() {
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
         when(snippetService.deleteSnippet(userId, "testSnippet"))
                 .thenReturn(new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT));
 
@@ -113,7 +113,7 @@ public class SnippetControllerTest {
     public void testUpdateStatus() {
         SnippetStatusInputDTO status = new SnippetStatusInputDTO();
         status.status = "PENDING";
-        UUID userId = UUID.randomUUID();
+        String userId = "550e8400-e29b-41d4-a716-446655440000";
 
         when(snippetService.updateSnippetStatus(userId, "testSnippet", SnippetStatus.PENDING))
                 .thenReturn(new ResponseEntity<>("200 OK", HttpStatus.OK));
@@ -155,7 +155,7 @@ public class SnippetControllerTest {
     public void testGetUserSnippets() {
         SnippetDTO snippetDTO = new SnippetDTO();
         snippetDTO.id = 1L;
-        snippetDTO.userId = UUID.randomUUID();
+        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
         snippetDTO.name = "testSnippet";
         snippetDTO.content = "snippet content";
 

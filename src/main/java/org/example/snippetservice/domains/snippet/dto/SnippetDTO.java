@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class SnippetDTO {
     public Long id;
-    public UUID userId;
+    public String userId;
     public String name;
     public String content;
     public String language;

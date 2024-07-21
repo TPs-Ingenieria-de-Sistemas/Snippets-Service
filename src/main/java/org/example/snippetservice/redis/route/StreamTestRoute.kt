@@ -16,15 +16,18 @@ private val logger: Logger = LoggerFactory.getLogger(Service::class.java)
 class StreamTestRoute
     @Autowired
     constructor(private val producer: LintEventsProducer) {
-        @PostMapping("/lint-stream/{userID}/{snippetID}/{rules}/{language}/{version}")
+        @PostMapping("/lint-stream/")
         suspend fun post(
-            @PathVariable userID: String,
-            @PathVariable snippetID: String,
-            @PathVariable rules: String,
-            @PathVariable language: String,
-            @PathVariable version: String,
+            @RequestBody lintRequest: LintRequestEvent
         ) {
+            val userID = lintRequest.userID
+            val snippetID = lintRequest.snippetID
+            val snippetName = lintRequest.snippetName
+            val rules = lintRequest.rules
+            val language = lintRequest.language
+            val version = lintRequest.version
             logger.info("TESTING LINT STREAM")
-            producer.publishEvent(userID, snippetID, rules, language, version)
+            producer.publishEvent(userID, snippetID, snippetName, rules, language, version)
         }
+    // docker compose up -d --froce-recreate api
     }

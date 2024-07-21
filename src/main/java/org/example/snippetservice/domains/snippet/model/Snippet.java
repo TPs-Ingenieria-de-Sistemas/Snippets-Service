@@ -16,7 +16,7 @@ public class Snippet {
     private Long id;
 
     @Column
-    private UUID userId;
+    private String userId;
 
     @Column
     private String name;
@@ -29,12 +29,12 @@ public class Snippet {
 
     @Column
     private SnippetStatus status;
-  
+
     public Long getId() {
         return id;
     }
 
-    public UUID getUserId() {
+    public String getUserId() {
         return userId;
     }
 
@@ -50,7 +50,7 @@ public class Snippet {
         this.id = id;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
@@ -77,7 +77,7 @@ public class Snippet {
     public void setStatus(SnippetStatus status) {
         this.status = status;
     }
-  
+
     public Snippet() {
     }
 

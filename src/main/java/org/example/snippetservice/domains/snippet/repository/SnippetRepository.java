@@ -8,6 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface SnippetRepository extends JpaRepository<Snippet, Long> {
-    Optional<Snippet> findByUserIdAndName(UUID userId, String name);
-    List<Snippet> findAllByUserId(UUID userId);
+    Optional<Snippet> findByUserIdAndName(String userId, String name);
+    List<Snippet> findAllByUserId(String userId);
 }
