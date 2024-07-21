@@ -17,12 +17,13 @@ class LintEventsProducer
         fun publishEvent(
             userID: String,
             snippetID: String,
+            snippetName: String,
             rules: String,
             language: String,
             version: String,
         ) {
             println("Publishing on stream: $streamKey")
-            val res = LintRequestEvent(userID, snippetID, rules, language, version)
+            val res = LintRequestEvent(userID, snippetID, snippetName, rules, language, version)
             emit(res)
         }
     }

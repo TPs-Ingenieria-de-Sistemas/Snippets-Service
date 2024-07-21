@@ -55,7 +55,11 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
 
     // redis-events
-    implementation 'com.example:redis-events:0.1.1-SNAPSHOT'
+    implementation 'com.example:redis-events:0.1.2-SNAPSHOT'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 }
 
 tasks.named('test') {
