@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'jacoco'
+    id 'com.diffplug.spotless' version '7.0.0.BETA1'
 }
 
 group = 'org.example'
@@ -10,6 +11,15 @@ version = '0.2.0'
 
 java {
     sourceCompatibility = '17'
+}
+
+spotless {
+    java {
+        eclipse().configFile('eclipse-formatting-rules.xml')
+        target 'src/**/*.java'
+        importOrder()
+        removeUnusedImports()
+    }
 }
 
 repositories {
@@ -57,7 +67,7 @@ jacocoTestReport {
         xml.required = true
         csv.required = false
         html.required = true
-        html.outputLocation = layout.buildDirectory.dir('jacocoHtml') // Carpeta para el informe HTML
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
     }
 }
 
@@ -74,3 +84,10 @@ jacocoTestCoverageVerification {
 tasks.named('check') {
     dependsOn 'jacocoTestCoverageVerification'
 }
+
+tasks.named('check') {
+    dependsOn 'spotlessCheck'
+}
+
+// Check Lint: ./gradlew spotlessCheck
+// Format code: ./gradlew spotlessApply

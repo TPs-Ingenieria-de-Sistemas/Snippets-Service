@@ -1,90 +1,87 @@
 package org.example.snippetservice.domains.snippet.model;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 
-import java.util.UUID;
-
 @Entity
-@Table(name = "snippet", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "name"})
-})
+@Table(name = "snippet", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "name"})})
 public class Snippet {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    @Column
-    private UUID userId;
+	@Column
+	private UUID userId;
 
-    @Column
-    private String name;
+	@Column
+	private String name;
 
-    @Column
-    private String content;
+	@Column
+	private String content;
 
-    @Column
-    private String language;
+	@Column
+	private String language;
 
-    @Column
-    private SnippetStatus status;
-  
-    public Long getId() {
-        return id;
-    }
+	@Column
+	private SnippetStatus status;
 
-    public UUID getUserId() {
-        return userId;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public UUID getUserId() {
+		return userId;
+	}
 
-    public String getContent() {
-        return content;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getContent() {
+		return content;
+	}
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setUserId(UUID userId) {
+		this.userId = userId;
+	}
 
-    public void setContent(String content) {
-        this.content = content;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+	public void setContent(String content) {
+		this.content = content;
+	}
 
-    public String getLanguage() {
-        return language;
-    }
+	public void setLanguage(String language) {
+		this.language = language;
+	}
 
-    public SnippetStatus getStatus() {
-        return status;
-    }
+	public String getLanguage() {
+		return language;
+	}
 
-    public void setStatus(SnippetStatus status) {
-        this.status = status;
-    }
-  
-    public Snippet() {
-    }
+	public SnippetStatus getStatus() {
+		return status;
+	}
 
-    public Snippet(CreateSnippetDTO snippetDTO) {
-        this.userId = snippetDTO.userId;
-        this.name = snippetDTO.name;
-        this.content = snippetDTO.content;
-        this.language = snippetDTO.language;
-    }
+	public void setStatus(SnippetStatus status) {
+		this.status = status;
+	}
+
+	public Snippet() {
+	}
+
+	public Snippet(CreateSnippetDTO snippetDTO) {
+		this.userId = snippetDTO.userId;
+		this.name = snippetDTO.name;
+		this.content = snippetDTO.content;
+		this.language = snippetDTO.language;
+	}
 }
