@@ -1,12 +1,11 @@
 package org.example.snippetservice.domains.snippet.service;
 
+import java.util.List;
+import java.util.UUID;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-import java.util.UUID;
 
 public interface SnippetService {
     ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Boolean isUpdating);

@@ -1,6 +1,9 @@
 package org.example.snippetservice.domains.snippet.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import org.example.snippetservice.domains.snippet.dto.*;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
 import org.slf4j.Logger;
@@ -22,9 +25,9 @@ public class SnippetController {
 
     private final SnippetService snippetService;
 
-    public SnippetController(SnippetService snippetService) {
-        this.snippetService = snippetService;
-    }
+	public SnippetController(SnippetService snippetService) {
+		this.snippetService = snippetService;
+	}
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
@@ -68,9 +71,11 @@ public class SnippetController {
         return new ResponseEntity<>(this.snippetService.getUserSnippets(userId), HttpStatus.OK);
     }
 
-    private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
-        return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null && !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null && !createSnippetDTO.language.isEmpty();
-    }
+	private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
+		return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null
+				&& !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null
+				&& !createSnippetDTO.language.isEmpty();
+	}
 
     @PutMapping("/status/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)

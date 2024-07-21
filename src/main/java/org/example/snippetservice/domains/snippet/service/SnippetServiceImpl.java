@@ -1,5 +1,9 @@
 package org.example.snippetservice.domains.snippet.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
@@ -12,11 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @Service
 public class SnippetServiceImpl implements SnippetService {
     private static final Logger logger = LoggerFactory.getLogger(SnippetServiceImpl.class);
@@ -26,9 +25,9 @@ public class SnippetServiceImpl implements SnippetService {
     private final String assetServiceUrl = "http://asset_service:8081/v1/asset/group-5/";
     private final String permitsUrl = "http://snippet-permit:8081/";
 
-    public SnippetServiceImpl(SnippetRepository snippetRepository) {
-        this.snippetRepository = snippetRepository;
-    }
+	public SnippetServiceImpl(SnippetRepository snippetRepository) {
+		this.snippetRepository = snippetRepository;
+	}
 
     @Override
     public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Boolean isUpdating) {
@@ -66,8 +65,8 @@ public class SnippetServiceImpl implements SnippetService {
             }
         }
 
-        return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
-    }
+		return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
+	}
 
     @Override
     public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name) {
@@ -162,11 +161,11 @@ public class SnippetServiceImpl implements SnippetService {
 
             this.deleteSnippet(userId, name);
 
-            CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-            createSnippetDTO.userId = userId;
-            createSnippetDTO.name = name;
-            createSnippetDTO.content = oldContent.content;
-            createSnippetDTO.language = oldContent.language;
+			CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
+			createSnippetDTO.userId = userId;
+			createSnippetDTO.name = name;
+			createSnippetDTO.content = oldContent.content;
+			createSnippetDTO.language = oldContent.language;
 
             if (newName != null) {
                 createSnippetDTO.name = newName;

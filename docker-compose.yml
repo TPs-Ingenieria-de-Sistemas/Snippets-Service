@@ -16,10 +16,11 @@ services:
       AUTH0_API: ${AUTH0_API}
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       PORT: ${PORT}
+      PERMIT_PORT: ${PERMIT_PORT}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
-      - "8082:8082" #el segundo puerto tiene que ser siempre 8082
+      - "8082:8082"
     volumes:
       - ./data:/app/data
     depends_on:
