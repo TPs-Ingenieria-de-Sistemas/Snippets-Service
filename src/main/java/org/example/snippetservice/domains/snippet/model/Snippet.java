@@ -1,7 +1,6 @@
 package org.example.snippetservice.domains.snippet.model;
 
 import jakarta.persistence.*;
-import java.util.UUID;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 
@@ -12,8 +11,8 @@ public class Snippet {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column
-	private UUID userId;
+    @Column
+    private String userId;
 
 	@Column
 	private String name;
@@ -24,16 +23,16 @@ public class Snippet {
 	@Column
 	private String language;
 
-	@Column
-	private SnippetStatus status;
+    @Column
+    private SnippetStatus status;
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public UUID getUserId() {
-		return userId;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
 	public String getName() {
 		return name;
@@ -47,9 +46,9 @@ public class Snippet {
 		this.id = id;
 	}
 
-	public void setUserId(UUID userId) {
-		this.userId = userId;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
 	public void setName(String name) {
 		this.name = name;
@@ -71,12 +70,12 @@ public class Snippet {
 		return status;
 	}
 
-	public void setStatus(SnippetStatus status) {
-		this.status = status;
-	}
+    public void setStatus(SnippetStatus status) {
+        this.status = status;
+    }
 
-	public Snippet() {
-	}
+    public Snippet() {
+    }
 
 	public Snippet(CreateSnippetDTO snippetDTO) {
 		this.userId = snippetDTO.userId;

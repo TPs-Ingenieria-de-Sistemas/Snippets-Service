@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'jacoco'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id 'com.diffplug.spotless' version '7.0.0.BETA1'
 }
 
@@ -23,7 +24,25 @@ spotless {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven {
+        name = "GitHubPackagesClassRedisStreams"
+        url = uri("https://maven.pkg.github.com/austral-ingsis/class-redis-streams")
+        credentials {
+            username = project.findProperty("GH_USER") ?: System.getenv("USERNAME")
+            password = project.findProperty("GH_PAT") ?: System.getenv("TOKEN")
+        }
+    }
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/TPs-Ingenieria-de-Sistemas/redis-events")
+        credentials {
+            username = project.findProperty("GH_USER") ?: System.getenv("USERNAME")
+            password = project.findProperty("GH_PAT") ?: System.getenv("TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -38,6 +57,19 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+
+    // redis-events
+    implementation 'com.example:redis-events:0.1.2-SNAPSHOT'
+
+    // Logging
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'ch.qos.logback:logback-classic:1.4.6'
 }
 
 tasks.named('test') {
@@ -56,6 +88,9 @@ tasks.register("installGitHooks", Copy) {
 
 tasks.named("build") {
     dependsOn("installGitHooks")
+}
+kotlin {
+    jvmToolchain(17)
 }
 
 jacoco {

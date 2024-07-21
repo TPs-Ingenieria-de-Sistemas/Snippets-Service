@@ -4,12 +4,12 @@ import java.util.UUID;
 import org.example.snippetservice.domains.snippet.model.Snippet;
 
 public class SnippetDTO {
-	public Long id;
-	public UUID userId;
-	public String name;
-	public String content;
-	public String language;
-	public SnippetStatus status;
+    public Long id;
+    public String userId;
+    public String name;
+    public String content;
+    public String language;
+    public SnippetStatus status;
 
 	public SnippetDTO() {
 	}

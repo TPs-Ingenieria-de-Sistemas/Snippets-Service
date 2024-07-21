@@ -17,8 +17,10 @@ services:
       AUTH0_DOMAIN: ${AUTH0_DOMAIN}
       PORT: ${PORT}
       PERMIT_PORT: ${PERMIT_PORT}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     ports:
-      - "8081:8081"
+      - "8082:8082"
     volumes:
       - ./data:/app/data
     depends_on:
@@ -61,7 +63,60 @@ services:
     env_file:
       - .env
 
+  redis:
+    container_name: "redis"
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+
+  printscript_service:
+    container_name: "printscript_service"
+    image: ghcr.io/tps-ingenieria-de-sistemas/printscript-service:0.0.2-snapshot
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "8084:8084"
+
+  snippet-permits:
+    container_name: "snippet-permits"
+    image: ghcr.io/tps-ingenieria-de-sistemas/snippet-permits:latest
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - POSTGRES_DOMAIN=snippet-permits-db
+      - POSTGRES_DB=${PERMITS_POSTGRES_DB}
+      - POSTGRES_USER=${PERMITS_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${PERMITS_POSTGRES_PASSWORD}
+      - AUTH0_API=${AUTH0_API}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+    depends_on:
+      - snippet-permits-db
+
+  snippet-permits-db:
+    image: postgres:alpine
+    container_name: "snippet-permits-db"
+    restart: always
+    environment:
+      - POSTGRES_DB=${PERMITS_POSTGRES_DB}
+      - POSTGRES_USER=${PERMITS_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${PERMITS_POSTGRES_PASSWORD}
+      - PGPORT=5433
+    ports:
+      - '5433:5433'
+    volumes:
+      - snippet-permits-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U ${PERMITS_POSTGRES_USER} -d ${PERMITS_POSTGRES_DB}' ]
+      interval: 1s
+      timeout: 1s
+      retries: 15
+
+
+
 volumes:
   blob:
     external: false
+  snippet-permits-db-data:
   db-data:
