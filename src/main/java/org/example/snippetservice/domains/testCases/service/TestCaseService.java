@@ -62,9 +62,9 @@ public class TestCaseService {
 		}
 	}
 
-	public Boolean executeTests(String ownerId, String fileName, Long testId) {
+	public Boolean executeTests(Long testId) {
 		TestCase testCase = this.testCaseRepository.findById(testId).orElseThrow();
-		Snippet snippet = this.snippetRepository.findByUserIdAndName(ownerId, fileName).orElseThrow();
+		Snippet snippet = this.snippetRepository.findByUserIdAndName(testCase.getOwnerId(), testCase.getFileName()).orElseThrow();
 		RunTestCaseDTO runTestCaseDTO = new RunTestCaseDTO(snippet.getContent(), testCase.getInput(),
 				testCase.getOutput(), testCase.getEnv());
 		try {

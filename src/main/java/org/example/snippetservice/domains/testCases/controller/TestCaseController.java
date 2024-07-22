@@ -41,9 +41,8 @@ public class TestCaseController {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@GetMapping("/{owner-id}/{file-name}/{test-id}")
-	public ResponseEntity<Boolean> executeTests(@PathVariable("owner-id") String ownerId,
-			@PathVariable("file-name") String fileName, @PathVariable("test-id") Long testId) {
-		return ResponseEntity.ok(testCaseService.executeTests(ownerId, fileName, testId));
+	@GetMapping("/{test-id}")
+	public ResponseEntity<Boolean> executeTests(@PathVariable("test-id") Long testId) {
+		return ResponseEntity.ok(testCaseService.executeTests(testId));
 	}
 }
