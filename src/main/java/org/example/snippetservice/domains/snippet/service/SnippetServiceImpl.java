@@ -47,7 +47,11 @@ public class SnippetServiceImpl implements SnippetService {
 
 	@Override
 	public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating) {
-
+        if(nameHasDash(createSnippetDTO.name)){
+            logger.warn("Snippet name cannot have upperscore: {}, name: {}", createSnippetDTO.userId,
+                    createSnippetDTO.name);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
 		logger.info("Creating snippet for user: {}", createSnippetDTO.userId);
 
 		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId,
@@ -236,4 +240,8 @@ public class SnippetServiceImpl implements SnippetService {
 
 		return new ResponseEntity<>("200 OK", HttpStatus.OK);
 	}
+
+    private boolean nameHasDash(String name){
+        return name.contains("-");
+    }
 }
