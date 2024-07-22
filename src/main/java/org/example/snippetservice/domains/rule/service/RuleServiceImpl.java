@@ -12,7 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class RuleServiceImpl implements RuleService {
 
-	private UserRuleRepository userRuleRepository;
+	private final UserRuleRepository userRuleRepository;
+
+	public RuleServiceImpl(UserRuleRepository userRuleRepository) {
+		this.userRuleRepository = userRuleRepository;
+	}
 
 	@Override
 	public List<UserRuleDTO> getRulesForUserByType(String userId, RuleType ruleType) {
