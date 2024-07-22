@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import org.example.snippetservice.domains.snippet.controller.SnippetController;
 import org.example.snippetservice.domains.snippet.dto.*;
 import org.example.snippetservice.domains.snippet.service.SnippetService;
@@ -16,10 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public class SnippetControllerTest {
 
@@ -34,13 +29,13 @@ public class SnippetControllerTest {
 		MockitoAnnotations.openMocks(this);
 	}
 
-    @Test
-    public void testCreateSnippet() {
-        CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-        createSnippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
-        createSnippetDTO.name = "testSnippet";
-        createSnippetDTO.content = "snippet content";
-        createSnippetDTO.language = "plaintext";
+	@Test
+	public void testCreateSnippet() {
+		CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
+		createSnippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
+		createSnippetDTO.name = "testSnippet";
+		createSnippetDTO.content = "snippet content";
+		createSnippetDTO.language = "plaintext";
 
 		SnippetDTO snippetDTO = new SnippetDTO();
 		snippetDTO.id = 1L;
@@ -59,14 +54,14 @@ public class SnippetControllerTest {
 		assertEquals("testSnippet", response.getBody().name);
 	}
 
-    @Test
-    public void testGetSnippet() {
-        String content = "snippet content";
-        SnippetDTO snippetDTO = new SnippetDTO();
-        snippetDTO.id = 1L;
-        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
-        snippetDTO.name = "testSnippet";
-        snippetDTO.content = content;
+	@Test
+	public void testGetSnippet() {
+		String content = "snippet content";
+		SnippetDTO snippetDTO = new SnippetDTO();
+		snippetDTO.id = 1L;
+		snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
+		snippetDTO.name = "testSnippet";
+		snippetDTO.content = content;
 
 		when(snippetService.getSnippetByUserIdAndName(snippetDTO.userId, "testSnippet"))
 				.thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
@@ -83,11 +78,11 @@ public class SnippetControllerTest {
 		updateSnippetDTO.newName = "updatedSnippet";
 		updateSnippetDTO.content = "updated content";
 
-        SnippetDTO snippetDTO = new SnippetDTO();
-        snippetDTO.id = 1L;
-        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
-        snippetDTO.name = "updatedSnippet";
-        snippetDTO.content = "updated content";
+		SnippetDTO snippetDTO = new SnippetDTO();
+		snippetDTO.id = 1L;
+		snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
+		snippetDTO.name = "updatedSnippet";
+		snippetDTO.content = "updated content";
 
 		when(snippetService.updateSnippet(snippetDTO.userId, "testSnippet", updateSnippetDTO.newName,
 				updateSnippetDTO.content)).thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
@@ -100,11 +95,11 @@ public class SnippetControllerTest {
 		assertEquals("updatedSnippet", response.getBody().name);
 	}
 
-    @Test
-    public void testDeleteSnippet() {
-        String userId = "550e8400-e29b-41d4-a716-446655440000";
-        when(snippetService.deleteSnippet(userId, "testSnippet"))
-                .thenReturn(new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT));
+	@Test
+	public void testDeleteSnippet() {
+		String userId = "550e8400-e29b-41d4-a716-446655440000";
+		when(snippetService.deleteSnippet(userId, "testSnippet"))
+				.thenReturn(new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT));
 
 		ResponseEntity<String> response = snippetController.deleteSnippet("testSnippet", userId);
 
@@ -112,11 +107,11 @@ public class SnippetControllerTest {
 		assertEquals("204 No Content", response.getBody());
 	}
 
-    @Test
-    public void testUpdateStatus() {
-        SnippetStatusInputDTO status = new SnippetStatusInputDTO();
-        status.status = "PENDING";
-        String userId = "550e8400-e29b-41d4-a716-446655440000";
+	@Test
+	public void testUpdateStatus() {
+		SnippetStatusInputDTO status = new SnippetStatusInputDTO();
+		status.status = "PENDING";
+		String userId = "550e8400-e29b-41d4-a716-446655440000";
 
 		when(snippetService.updateSnippetStatus(userId, "testSnippet", SnippetStatus.PENDING))
 				.thenReturn(new ResponseEntity<>("200 OK", HttpStatus.OK));
@@ -154,13 +149,13 @@ public class SnippetControllerTest {
 		assertNull(response.getBody());
 	}
 
-    @Test
-    public void testGetUserSnippets() {
-        SnippetDTO snippetDTO = new SnippetDTO();
-        snippetDTO.id = 1L;
-        snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
-        snippetDTO.name = "testSnippet";
-        snippetDTO.content = "snippet content";
+	@Test
+	public void testGetUserSnippets() {
+		SnippetDTO snippetDTO = new SnippetDTO();
+		snippetDTO.id = 1L;
+		snippetDTO.userId = "550e8400-e29b-41d4-a716-446655440000";
+		snippetDTO.name = "testSnippet";
+		snippetDTO.content = "snippet content";
 
 		when(snippetService.getUserSnippets(snippetDTO.userId)).thenReturn(List.of(snippetDTO));
 
