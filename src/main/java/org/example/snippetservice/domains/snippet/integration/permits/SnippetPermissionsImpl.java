@@ -41,4 +41,32 @@ public class SnippetPermissionsImpl implements SnippetPermissionsApi {
 				Boolean.class);
 	}
 
+	@Override
+	public ResponseEntity<?> sharePermissions(String fileName, PermitDTO permitDTO) {
+		Jwt id = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(id.getTokenValue());
+		HttpEntity<PermitDTO> entity = new HttpEntity<>(permitDTO, headers);
+
+		String result = this.restTemplate.postForObject(permitsUrl+"/manage/"+fileName, entity, String.class);
+		return ResponseEntity.ok().body(result);
+	}
+
+	@Override
+	public ResponseEntity<?> removePermissions(String fileName, PermitDTO permitDTO) {
+		Jwt id = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(id.getTokenValue());
+		HttpEntity<PermitDTO> entity = new HttpEntity<>(permitDTO, headers);
+
+		return this.restTemplate.exchange(
+				permitsUrl + "/manage/" + fileName,
+				HttpMethod.DELETE,
+				entity,
+				String.class
+		);
+	}
+
 }
