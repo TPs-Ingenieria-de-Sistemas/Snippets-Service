@@ -19,14 +19,16 @@ public class RuleController {
 	}
 
 	@GetMapping("/user-rules")
-	public List<UserRuleDTO> getUserRules(Jwt jwt, @RequestParam("ruleType") RuleType ruleType) {
+	public List<UserRuleDTO> getUserRules(@RequestParam("ruleType") RuleType ruleType) {
+		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String userId = jwt.getSubject();
 		return ruleService.getRulesForUserByType(userId, ruleType);
 	}
 
 	@PutMapping("/update-user-rules")
-	public ResponseEntity<List<UserRuleDTO>> updateUserRule(Jwt jwt,
+	public ResponseEntity<List<UserRuleDTO>> updateUserRule(
 			@RequestBody List<UpdateUserRuleDTO> updatedRules) {
+		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String userId = jwt.getSubject();
 		List<UserRuleDTO> updatedUserRules = ruleService.updateUserRules(userId, updatedRules);
 		return ResponseEntity.ok(updatedUserRules);
