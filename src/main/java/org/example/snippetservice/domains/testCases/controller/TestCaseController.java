@@ -26,7 +26,7 @@ public class TestCaseController {
 	public ResponseEntity<TestCase> createTestCase(@PathVariable("owner-id") String ownerId,
 			@PathVariable("file-name") String fileName, @RequestBody @Valid CreateTestCaseDTO testCaseDTO) {
 		String userId = userService.getUserId();
-		return ResponseEntity.ok(testCaseService.createTestCase(testCaseDTO, ownerId, userId, fileName));
+		return testCaseService.createTestCase(testCaseDTO, ownerId, userId, fileName);
 	}
 
 	@GetMapping("/{owner-id}/{file-name}")
