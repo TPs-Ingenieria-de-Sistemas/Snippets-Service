@@ -207,9 +207,7 @@ public class SnippetServiceImpl implements SnippetService {
 				logger.error("Error checking permission for updating snippet, {}", snippetId, e);
 				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
 			}
-
-			this.deleteSnippet(oldContent.id, jwt);
-
+			
 			SnippetDTO newSnippetDTO = new SnippetDTO();
 			newSnippetDTO.id = oldContent.id;
 			newSnippetDTO.name = oldContent.name;
@@ -227,6 +225,7 @@ public class SnippetServiceImpl implements SnippetService {
 			String deleteResult = assetServiceApi.deleteAsset(oldContent.userId, oldContent.name);
 			String result = assetServiceApi.createAsset(newSnippetDTO.userId, newSnippetDTO.name, newSnippetDTO.content);
 
+			snippetRepository.save(new Snippet(newSnippetDTO));
 			return ResponseEntity.status(HttpStatus.OK).body(newSnippetDTO);
 		} catch (Exception e) {
 			logger.error("Error updating snippet for {}", snippetId, e);

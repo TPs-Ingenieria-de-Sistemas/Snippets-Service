@@ -2,6 +2,7 @@ package org.example.snippetservice.domains.snippet.model;
 
 import jakarta.persistence.*;
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
+import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
 
 @Entity
@@ -75,5 +76,14 @@ public class Snippet {
 	}
 
 	public Snippet() {
+	}
+
+	public Snippet(SnippetDTO dto) {
+		id = dto.id;
+		userId = dto.userId;
+		name = dto.name;
+		content = dto.content;
+		language = dto.language;
+		status = dto.status;
 	}
 }
