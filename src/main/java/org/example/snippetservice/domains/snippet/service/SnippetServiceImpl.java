@@ -53,6 +53,7 @@ public class SnippetServiceImpl implements SnippetService {
             logger.warn("Snippet name cannot contain dashes for user: {}, name: {}", userId, createSnippetDTO.name);
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+
 		logger.info("Creating snippet for user: {}", userId);
 
 		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(userId,
