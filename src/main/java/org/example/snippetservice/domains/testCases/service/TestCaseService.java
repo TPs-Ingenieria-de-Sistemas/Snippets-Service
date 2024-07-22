@@ -5,13 +5,13 @@ import java.util.Optional;
 import org.example.snippetservice.domains.snippet.model.Snippet;
 import org.example.snippetservice.domains.snippet.repository.SnippetRepository;
 import org.example.snippetservice.domains.testCases.dto.CreateTestCaseDTO;
-import org.example.snippetservice.domains.testCases.dto.RunTestCaseDTO;
 import org.example.snippetservice.domains.testCases.model.TestCase;
 import org.example.snippetservice.domains.testCases.repository.TestCaseRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import TestCaseDTO.RunTestCaseDTO;
 
 @Service
 public class TestCaseService {

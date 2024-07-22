@@ -1,7 +1,6 @@
 package org.example.snippetservice.redis.consumer
 
-import com.example.printscriptservice.redisEvents.LintRequestEvent
-import com.example.printscriptservice.redisEvents.LintResultEvent
+import redisEvents.LintResultEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
