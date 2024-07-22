@@ -210,19 +210,24 @@ public class SnippetServiceImpl implements SnippetService {
 
 			this.deleteSnippet(oldContent.id, jwt);
 
-			CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-			createSnippetDTO.name = oldContent.name;
-			createSnippetDTO.content = oldContent.content;
-			createSnippetDTO.language = oldContent.language;
+			SnippetDTO newSnippetDTO = new SnippetDTO();
+			newSnippetDTO.id = oldContent.id;
+			newSnippetDTO.name = oldContent.name;
+			newSnippetDTO.content = content;
+			newSnippetDTO.language = oldContent.language;
+			newSnippetDTO.status = oldContent.status;
 
 			if (newName != null) {
-				createSnippetDTO.name = newName;
+				newSnippetDTO.name = newName;
 			}
 			if (content != null) {
-				createSnippetDTO.content = content;
+				newSnippetDTO.content = content;
 			}
 
-			return this.createSnippet(createSnippetDTO, jwt, true);
+			String deleteResult = assetServiceApi.deleteAsset(oldContent.userId, oldContent.name);
+			String result = assetServiceApi.createAsset(newSnippetDTO.userId, newSnippetDTO.name, newSnippetDTO.content);
+
+			return ResponseEntity.status(HttpStatus.OK).body(newSnippetDTO);
 		} catch (Exception e) {
 			logger.error("Error updating snippet for {}", snippetId, e);
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
