@@ -1,8 +1,11 @@
 package org.example.snippetservice.domains.testCases.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+
 import java.util.List;
 
+@Getter
 public class CreateTestCaseDTO {
 	Long id;
 	@NotBlank
