@@ -2,22 +2,24 @@ server:
   port: 8082
 
 spring:
-
   application:
     name: snippet-service
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: 6379
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://dev-nm7wo52kqh60todu.us.auth0.com/.well-known/jwks.json
 
 redis:
   stream:
     linter-request-key: "linter-request-key"
     linter-response-key: "linter-response-key"
-
-  # groupIds to be used by consumers
-  # facilita que múltiples consumidores puedan leer desde el mismo stream sin procesar los mismos mensajes más de una vez.
-  # Si están agrupados se puede coordinar la lectura
   groups:
     lint: "lint-group"
 
+auth0:
+  audience: ${AUTH0_DOMAIN:https://dev-nm7wo52kqh60todu.us.auth0.com/}

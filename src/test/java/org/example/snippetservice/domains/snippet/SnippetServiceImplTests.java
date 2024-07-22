@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 import org.example.snippetservice.domains.snippet.dto.CreateSnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetDTO;
 import org.example.snippetservice.domains.snippet.dto.SnippetStatus;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito.*;
+
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,7 @@ public class SnippetServiceImplTests {
 
 		when(snippetRepository.findByUserIdAndName(dto.userId, dto.name)).thenReturn(Optional.of(new Snippet()));
 
-		ResponseEntity<SnippetDTO> response = snippetService.createSnippet(dto, false);
+		ResponseEntity<SnippetDTO> response = snippetService.createSnippet(dto, null, false);
 
 		assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
 	}
@@ -60,7 +60,7 @@ public class SnippetServiceImplTests {
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
-		ResponseEntity<SnippetDTO> response = snippetService.getSnippetByUserIdAndName(userId, name);
+		ResponseEntity<SnippetDTO> response = snippetService.getSnippetByUserIdAndName(userId, name, null);
 
 		assertNull(response.getBody());
 	}
@@ -75,7 +75,7 @@ public class SnippetServiceImplTests {
 
 		when(snippetRepository.findById(snippetId)).thenReturn(Optional.empty());
 
-		ResponseEntity<SnippetDTO> response = snippetService.updateSnippet(userId, dto.name, "newName", dto.content);
+		ResponseEntity<SnippetDTO> response = snippetService.updateSnippet(userId, dto.name, "newName", dto.content, null);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}
@@ -87,7 +87,7 @@ public class SnippetServiceImplTests {
 
 		when(snippetRepository.findByUserIdAndName(userId, name)).thenReturn(Optional.empty());
 
-		ResponseEntity<String> response = snippetService.deleteSnippet(userId, name);
+		ResponseEntity<String> response = snippetService.deleteSnippet(userId, name, null);
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 	}

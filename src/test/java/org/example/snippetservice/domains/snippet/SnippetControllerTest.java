@@ -49,7 +49,7 @@ public class SnippetControllerTest {
 		snippetDTO.content = "snippet content";
 		snippetDTO.language = "plaintext";
 
-		when(snippetService.createSnippet(createSnippetDTO, false))
+		when(snippetService.createSnippet(createSnippetDTO, null, false))
 				.thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.CREATED));
 
 		ResponseEntity<SnippetDTO> response = snippetController.storeSnippet(createSnippetDTO);
@@ -68,7 +68,7 @@ public class SnippetControllerTest {
         snippetDTO.name = "testSnippet";
         snippetDTO.content = content;
 
-		when(snippetService.getSnippetByUserIdAndName(snippetDTO.userId, "testSnippet"))
+		when(snippetService.getSnippetByUserIdAndName(snippetDTO.userId, "testSnippet", null))
 				.thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
 
 		ResponseEntity<SnippetDTO> response = snippetController.getSnippet(snippetDTO.userId, "testSnippet");
@@ -90,7 +90,7 @@ public class SnippetControllerTest {
         snippetDTO.content = "updated content";
 
 		when(snippetService.updateSnippet(snippetDTO.userId, "testSnippet", updateSnippetDTO.newName,
-				updateSnippetDTO.content)).thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
+				updateSnippetDTO.content, null)).thenReturn(new ResponseEntity<>(snippetDTO, HttpStatus.OK));
 
 		ResponseEntity<SnippetDTO> response = snippetController.updateSnippet(snippetDTO.userId, "testSnippet",
 				updateSnippetDTO);
@@ -103,7 +103,7 @@ public class SnippetControllerTest {
     @Test
     public void testDeleteSnippet() {
         String userId = "550e8400-e29b-41d4-a716-446655440000";
-        when(snippetService.deleteSnippet(userId, "testSnippet"))
+        when(snippetService.deleteSnippet(userId, "testSnippet", null))
                 .thenReturn(new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT));
 
 		ResponseEntity<String> response = snippetController.deleteSnippet("testSnippet", userId);
