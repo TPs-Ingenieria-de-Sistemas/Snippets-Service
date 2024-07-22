@@ -20,13 +20,17 @@ public class AssetServiceImpl implements AssetServiceApi {
 
 	@Override
 	public String createAsset(String userId, String fileName, String content) {
-		String url = assetsServiceUrl + "snippet-" + userId + "-" + fileName;
+        String sanitizedUserId = userId.replace("|", "-");
+
+        String url = assetsServiceUrl + "snippet-" + sanitizedUserId + "-" + fileName;
+
 		this.restTemplate.postForObject(url, content, String.class);
 		return "Snippet created";
 	}
 
 	@Override
 	public String deleteAsset(String userId, String assetName) {
+
 		String url = assetsServiceUrl + "snippet-" + userId + "-" + assetName;
 		this.restTemplate.delete(url);
 		return "Snippet deleted";
