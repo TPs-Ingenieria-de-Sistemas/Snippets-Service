@@ -14,15 +14,17 @@ public class AssetServiceImpl implements AssetServiceApi {
 
 	@Override
 	public void getAsset(String userId, String assetName) {
-		String url = assetsServiceUrl + "snippet-" + userId + "-" + assetName;
+		String sanitizedUserId = userId.replace("|", "-");
+
+		String url = assetsServiceUrl + "snippet-" + sanitizedUserId + "-" + assetName;
 		this.restTemplate.getForObject(url, String.class);
 	}
 
 	@Override
 	public String createAsset(String userId, String fileName, String content) {
-        String sanitizedUserId = userId.replace("|", "-");
+		String sanitizedUserId = userId.replace("|", "-");
 
-        String url = assetsServiceUrl + "snippet-" + sanitizedUserId + "-" + fileName;
+		String url = assetsServiceUrl + "snippet-" + sanitizedUserId + "-" + fileName;
 
 		this.restTemplate.postForObject(url, content, String.class);
 		return "Snippet created";
@@ -31,7 +33,9 @@ public class AssetServiceImpl implements AssetServiceApi {
 	@Override
 	public String deleteAsset(String userId, String assetName) {
 
-		String url = assetsServiceUrl + "snippet-" + userId + "-" + assetName;
+		String sanitizedUserId = userId.replace("|", "-");
+
+		String url = assetsServiceUrl + "snippet-" + sanitizedUserId + "-" + assetName;
 		this.restTemplate.delete(url);
 		return "Snippet deleted";
 	}
