@@ -2,7 +2,6 @@ package org.example.snippetservice.domains.testCases.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.example.snippetservice.domains.snippet.model.Snippet;
 import org.example.snippetservice.domains.snippet.repository.SnippetRepository;
 import org.example.snippetservice.domains.testCases.dto.CreateTestCaseDTO;
@@ -27,17 +26,18 @@ public class TestCaseService {
 	}
 
 	public ResponseEntity<TestCase> createTestCase(CreateTestCaseDTO createTestCaseDTO, String ownerId, String userId,
-												  String fileName) {
+			String fileName) {
 		Optional<Snippet> snippetOp = snippetRepository.findByUserIdAndName(ownerId, fileName);
-		if (snippetOp.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		if (snippetOp.isEmpty())
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		// Missing validate user permits
 
 		TestCase finalTestCase;
 		if (createTestCaseDTO.getId() == null) {
 			String input = String.join(";", createTestCaseDTO.getInput());
 			String output = String.join(";", createTestCaseDTO.getOutput());
-			finalTestCase = this.testCaseRepository.save(new TestCase(ownerId, fileName, createTestCaseDTO.getTestCaseName(),
-					input, output, createTestCaseDTO.getEnv()));
+			finalTestCase = this.testCaseRepository.save(new TestCase(ownerId, fileName,
+					createTestCaseDTO.getTestCaseName(), input, output, createTestCaseDTO.getEnv()));
 		} else {
 			TestCase testCase = this.testCaseRepository.findById(createTestCaseDTO.getId()).orElseThrow();
 			testCase.setTestCaseName(createTestCaseDTO.getTestCaseName());
