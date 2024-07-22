@@ -76,11 +76,4 @@ public class Snippet {
 
 	public Snippet() {
 	}
-
-	public Snippet(CreateSnippetDTO snippetDTO) {
-		this.userId = snippetDTO.userId;
-		this.name = snippetDTO.name;
-		this.content = snippetDTO.content;
-		this.language = snippetDTO.language;
-	}
 }

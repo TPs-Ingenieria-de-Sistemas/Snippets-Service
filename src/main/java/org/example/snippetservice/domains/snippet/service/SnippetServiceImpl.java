@@ -47,36 +47,37 @@ public class SnippetServiceImpl implements SnippetService {
 
 	@Override
 	public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating) {
+		String userId = jwt.getSubject();
+
         if(nameHasDash(createSnippetDTO.name)){
-            logger.warn("Snippet name cannot have upperscore: {}, name: {}", createSnippetDTO.userId,
-                    createSnippetDTO.name);
+            logger.warn("Snippet name cannot contain dashes for user: {}, name: {}", userId, createSnippetDTO.name);
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-		logger.info("Creating snippet for user: {}", createSnippetDTO.userId);
+		logger.info("Creating snippet for user: {}", userId);
 
-		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId,
+		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(userId,
 				createSnippetDTO.name);
 		if (snippetOptional.isPresent()) {
-			logger.warn("Snippet already exists for user: {}, name: {}", createSnippetDTO.userId,
+			logger.warn("Snippet already exists for user: {}, name: {}", userId,
 					createSnippetDTO.name);
 			return new ResponseEntity<>(null, HttpStatus.CONFLICT);
 		}
 
 		Snippet snippet = new Snippet();
-		snippet.setUserId(createSnippetDTO.userId);
+		snippet.setUserId(userId);
 		snippet.setName(createSnippetDTO.name);
 		snippet.setContent(createSnippetDTO.content);
 		snippet.setLanguage(createSnippetDTO.language);
 
 		try {
-			logger.info("Storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId,
+			logger.info("Storing snippet in bucket for user: {}, name: {}", userId,
 					createSnippetDTO.name);
-			assetServiceApi.createAsset(createSnippetDTO.userId.toString(), createSnippetDTO.name,
+			assetServiceApi.createAsset(userId, createSnippetDTO.name,
 					createSnippetDTO.content);
-			logger.info("Snippet stored in bucket for user: {}, name: {}", createSnippetDTO.userId,
+			logger.info("Snippet stored in bucket for user: {}, name: {}", userId,
 					createSnippetDTO.name);
 		} catch (Exception e) {
-			logger.error("Error storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId,
+			logger.error("Error storing snippet in bucket for user: {}, name: {}", userId,
 					createSnippetDTO.name, e);
 			snippet.setContent("COULD NOT STORE IN BUCKET");
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -94,43 +95,43 @@ public class SnippetServiceImpl implements SnippetService {
 		}
 
 		this.snippetRepository.save(snippet);
-		logger.info("Snippet saved to database for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
+		logger.info("Snippet saved to database for user: {}, name: {}", userId, createSnippetDTO.name);
 
 		return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
 	}
 
 	@Override
-	public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name, Jwt jwt) {
-		logger.info("Fetching snippet for user: {}, name: {}", userId, name);
+	public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(Long snippetId, Jwt jwt) {
+		logger.info("Fetching snippet: {}", snippetId);
 
 		try {
-			Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
-			logger.info("Snippet found in database for user: {}, name: {}", userId, name);
+			Snippet snippet = this.snippetRepository.findById(snippetId).orElseThrow();
+			logger.info("Snippet found in database for snippetId: {}", snippetId);
 
 			try {
-				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 4);
+				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(snippet.getName(), 4);
 				if (Boolean.FALSE.equals(hasPermission.getBody())) {
-					logger.warn("Permission denied for user: {}, name: {}", userId, name);
+					logger.warn("Permission denied for user: {}, name: {}", jwt.getSubject(), snippet.getName());
 					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
 				}
 			} catch (Exception e) {
-				logger.error("Error checking permission for user: {}, name: {}", userId, name, e);
+				logger.error("Error checking permission for user: {}, name: {}", jwt.getSubject(), snippet.getName(), e);
 				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
 			}
 
 			try {
-				assetServiceApi.getAsset(userId, name);
+				assetServiceApi.getAsset(snippet.getUserId(), snippet.getName());
 				/*
 				 * this.restTemplate.getForObject(assetServiceUrl + "snippet-" +
 				 * userId.toString() + "-" + name, String.class);
 				 */
 				return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.OK);
 			} catch (Exception e) {
-				logger.error("Error fetching snippet from bucket for user: {}, name: {}", userId, name, e);
+				logger.error("Error fetching snippet from bucket for user: {}, name: {}", snippet.getUserId(), snippet.getName(), e);
 				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
+			logger.error("Snippet not found for with id: ", snippetId, e);
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
 	}
@@ -184,7 +185,12 @@ public class SnippetServiceImpl implements SnippetService {
 		logger.info("Updating snippet for user: {}, name: {}", userId, name);
 
 		try {
-			SnippetDTO oldContent = this.getSnippetByUserIdAndName(userId, name, jwt).getBody();
+			Optional<Snippet> oldContentAux = this.snippetRepository.findByUserIdAndName(userId, name);
+			if (oldContentAux.isEmpty()) {
+				logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
+			SnippetDTO oldContent = getSnippetByUserIdAndName(oldContentAux.get().getId(), jwt).getBody();
 			if (oldContent == null) {
 				logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
 				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -204,7 +210,6 @@ public class SnippetServiceImpl implements SnippetService {
 			this.deleteSnippet(userId, name, jwt);
 
 			CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-			createSnippetDTO.userId = userId;
 			createSnippetDTO.name = name;
 			createSnippetDTO.content = oldContent.content;
 			createSnippetDTO.language = oldContent.language;
@@ -240,8 +245,7 @@ public class SnippetServiceImpl implements SnippetService {
 
 		return new ResponseEntity<>("200 OK", HttpStatus.OK);
 	}
-
-    private boolean nameHasDash(String name){
+    private boolean nameHasDash(String name) {
         return name.contains("-");
     }
 }
