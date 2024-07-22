@@ -8,6 +8,10 @@ on:
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
+    env:
+      USERNAME: ${{ secrets.GH_USER }}
+      TOKEN: ${{ secrets.GH_PAT }}
+      
     steps:
       - uses: actions/checkout@v4
       - name: Extract gradle proyect vesrion and name 
@@ -20,9 +24,6 @@ jobs:
 
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
-
-          echo "USERNAME=${{ secrets.GH_USER }}" >> $GITHUB_ENV
-          echo "TOKEN=${{ secrets.GH_PAT }}" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GH_PAT }} | docker login ghcr.io -u ${{ secrets.GH_USER }} --password-stdin
