@@ -1,6 +1,10 @@
 FROM gradle:8.7.0-jdk17-jammy AS build
 COPY  . /app
 WORKDIR /app
+
+ENV USERNAME
+ENV TOKEN
+
 RUN chmod +x gradlew
 RUN ./gradlew bootJar
 
