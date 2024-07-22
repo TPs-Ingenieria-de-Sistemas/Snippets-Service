@@ -68,7 +68,7 @@ public class TestCaseService {
 		RunTestCaseDTO runTestCaseDTO = new RunTestCaseDTO(snippet.getContent(), testCase.getInput(),
 				testCase.getOutput(), testCase.getEnv());
 		try {
-			return this.restTemplate.postForObject(printscriptUrl, runTestCaseDTO, Boolean.class);
+			return this.restTemplate.postForObject(printscriptUrl+"/test", runTestCaseDTO, Boolean.class);
 		} catch (Exception e) {
 			throw new RuntimeException("Error executing tests");
 		}
