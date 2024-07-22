@@ -139,26 +139,26 @@ public class SnippetServiceImpl implements SnippetService {
 
 	// TODO: Implement delete permits (?) para mí sí
 	@Override
-	public ResponseEntity<String> deleteSnippet(String userId, String name, Jwt jwt) {
-		logger.info("Deleting snippet for user: {}, name: {}", userId, name);
+	public ResponseEntity<String> deleteSnippet(Long snippetId, Jwt jwt) {
+		logger.info("Deleting snippet: {}", snippetId);
 
 		try {
-			Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+			Snippet snippet = this.snippetRepository.findById(snippetId).orElseThrow();
 
 			try {
-				assetServiceApi.deleteAsset(userId, name);
+				assetServiceApi.deleteAsset(snippet.getUserId(), snippet.getName());
 				/*
 				 * this.restTemplate.delete(assetServiceUrl + "snippet-" + userId.toString() +
 				 * "-" + name);
 				 */
 				this.snippetRepository.delete(snippet);
-				logger.info("Snippet deleted for user: {}, name: {}", userId, name);
+				logger.info("Snippet deleted for user: {}, name: {}", snippet.getUserId(), snippet.getName());
 			} catch (Exception e) {
-				logger.error("Error deleting snippet for user: {}, name: {}", userId, name, e);
+				logger.error("Error deleting snippet for user: {}, name: {}", snippet.getUserId(), snippet.getName(), e);
 				return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
-			logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
+			logger.error("Snippet not found: {}", snippetId, e);
 			return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
 		}
 
@@ -181,37 +181,37 @@ public class SnippetServiceImpl implements SnippetService {
 	}
 
 	@Override
-	public ResponseEntity<SnippetDTO> updateSnippet(String userId, String name, String newName, String content,
+	public ResponseEntity<SnippetDTO> updateSnippet(Long snippetId, String newName, String content,
 			Jwt jwt) {
-		logger.info("Updating snippet for user: {}, name: {}", userId, name);
+		logger.info("Updating snippet for {}", snippetId);
 
 		try {
-			Optional<Snippet> oldContentAux = this.snippetRepository.findByUserIdAndName(userId, name);
+			Optional<Snippet> oldContentAux = this.snippetRepository.findById(snippetId);
 			if (oldContentAux.isEmpty()) {
-				logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
+				logger.warn("Snippet not found for update, {}", snippetId);
 				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 			}
 			SnippetDTO oldContent = getSnippetByUserIdAndName(oldContentAux.get().getId(), jwt).getBody();
 			if (oldContent == null) {
-				logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
+				logger.warn("Snippet not found for update, {}", snippetId);
 				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 			}
 
 			try {
-				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 2);
+				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(oldContent.name, 2);
 				if (Boolean.FALSE.equals(hasPermission.getBody())) {
-					logger.warn("Permission denied for updating snippet, user: {}, name: {}", userId, name);
+					logger.warn("Permission denied for updating snippet, {}", snippetId);
 					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
 				}
 			} catch (Exception e) {
-				logger.error("Error checking permission for updating snippet, user: {}, name: {}", userId, name, e);
+				logger.error("Error checking permission for updating snippet, {}", snippetId, e);
 				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
 			}
 
-			this.deleteSnippet(userId, name, jwt);
+			this.deleteSnippet(oldContent.id, jwt);
 
 			CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
-			createSnippetDTO.name = name;
+			createSnippetDTO.name = oldContent.name;
 			createSnippetDTO.content = oldContent.content;
 			createSnippetDTO.language = oldContent.language;
 
@@ -224,7 +224,7 @@ public class SnippetServiceImpl implements SnippetService {
 
 			return this.createSnippet(createSnippetDTO, jwt, true);
 		} catch (Exception e) {
-			logger.error("Error updating snippet for user: {}, name: {}", userId, name, e);
+			logger.error("Error updating snippet for {}", snippetId, e);
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
 	}

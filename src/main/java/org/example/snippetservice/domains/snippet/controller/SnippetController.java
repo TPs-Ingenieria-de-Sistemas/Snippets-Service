@@ -45,22 +45,22 @@ public class SnippetController {
 		return this.snippetService.getSnippetByUserIdAndName(snippetId, jwt);
 	}
 
-	@DeleteMapping("/{userId}/{name}")
+	@DeleteMapping("/{snippetId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public ResponseEntity<String> deleteSnippet(@PathVariable String name, @PathVariable String userId) {
+	public ResponseEntity<String> deleteSnippet(@PathVariable Long snippetId) {
 		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		return this.snippetService.deleteSnippet(userId, name, jwt);
+		return this.snippetService.deleteSnippet(snippetId, jwt);
 	}
 
-	@PutMapping("/{userId}/{name}")
+	@PutMapping("/{snippetId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable String userId, @PathVariable String name,
+	public ResponseEntity<SnippetDTO> updateSnippet(@PathVariable Long snippetId,
 			@Valid @RequestBody UpdateSnippetDTO newSnippet) {
 		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		return this.snippetService.updateSnippet(userId, name, newSnippet.newName, newSnippet.content, jwt);
+		return this.snippetService.updateSnippet(snippetId, newSnippet.newName, newSnippet.content, jwt);
 	}
 
 	@GetMapping("/by_user")
