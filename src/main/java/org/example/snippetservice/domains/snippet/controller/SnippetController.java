@@ -66,14 +66,12 @@ public class SnippetController {
 		return this.snippetService.updateSnippet(userId, name, newSnippet.newName, newSnippet.content, jwt);
 	}
 
-	@GetMapping("/by_user/{userId}")
+	@GetMapping("/by_user")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ResponseEntity<List<SnippetDTO>> getUserSnippets(@PathVariable String userId) {
-		// TODO
+	public ResponseEntity<List<SnippetDTO>> getUserSnippets() {
 		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-		return new ResponseEntity<>(this.snippetService.getUserSnippets(userId), HttpStatus.OK);
+		return new ResponseEntity<>(this.snippetService.getUserSnippets(jwt.getSubject()), HttpStatus.OK);
 	}
 
 	private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
