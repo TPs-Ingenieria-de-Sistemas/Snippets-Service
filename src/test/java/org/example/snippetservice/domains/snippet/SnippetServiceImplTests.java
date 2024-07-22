@@ -5,6 +5,7 @@ import org.example.snippetservice.domains.snippet.service.SnippetServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.client.RestTemplate;
 
