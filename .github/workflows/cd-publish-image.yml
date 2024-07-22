@@ -31,7 +31,7 @@ jobs:
           push: true
           build-args: |
             USERNAME=${{ secrets.GH_USER }}
-            VITE_AUTH0_PASSWORD=${{ secrets.GH_PAT }}
+            TOKEN=${{ secrets.GH_PAT }}
           tags: |
             ghcr.io/tps-ingenieria-de-sistemas/${{ env.PROJECT_NAME }}:${{ env.VERSION }}
             ghcr.io/tps-ingenieria-de-sistemas/${{ env.PROJECT_NAME }}:latest
