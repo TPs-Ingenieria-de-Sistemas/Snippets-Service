@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 public interface SnippetService {
 	ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating);
-	ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name, Jwt jwt);
+	ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(Long snippetId, Jwt jwt);
 	ResponseEntity<String> deleteSnippet(String userId, String name, Jwt jwt);
 	List<SnippetDTO> getUserSnippets(String userId);
 	ResponseEntity<SnippetDTO> updateSnippet(String userId, String name, String newName, String content, Jwt jwt);

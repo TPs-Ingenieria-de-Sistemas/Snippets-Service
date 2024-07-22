@@ -29,9 +29,6 @@ public class SnippetController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public ResponseEntity<SnippetDTO> storeSnippet(@Valid @RequestBody CreateSnippetDTO snippet) {
-		logger.info("Snippet id: {}", snippet.userId);
-		logger.info("Snippet id type: {}", snippet.userId.getClass());
-
 		if (!validateCreateSnippetDTO(snippet)) {
 			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 		}
@@ -39,13 +36,13 @@ public class SnippetController {
 		return this.snippetService.createSnippet(snippet, jwt, false);
 	}
 
-	@GetMapping("/{userId}/{name}")
+	@GetMapping("/{snippetId}")
 	@ResponseStatus(HttpStatus.OK)
 	@ResponseBody
-	public ResponseEntity<SnippetDTO> getSnippet(@PathVariable String userId, @PathVariable String name) {
+	public ResponseEntity<SnippetDTO> getSnippet(@PathVariable Long snippetId) {
 		Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		return this.snippetService.getSnippetByUserIdAndName(userId, name, jwt);
+		return this.snippetService.getSnippetByUserIdAndName(snippetId, jwt);
 	}
 
 	@DeleteMapping("/{userId}/{name}")
@@ -75,7 +72,7 @@ public class SnippetController {
 	}
 
 	private boolean validateCreateSnippetDTO(CreateSnippetDTO createSnippetDTO) {
-		return createSnippetDTO.userId != null && createSnippetDTO.name != null && createSnippetDTO.content != null
+		return createSnippetDTO.name != null && createSnippetDTO.content != null
 				&& !createSnippetDTO.name.isEmpty() && createSnippetDTO.language != null
 				&& !createSnippetDTO.language.isEmpty();
 	}
