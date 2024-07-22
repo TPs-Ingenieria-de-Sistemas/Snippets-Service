@@ -49,6 +49,11 @@ public class SnippetServiceImpl implements SnippetService {
 	public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating) {
 		String userId = jwt.getSubject();
 
+        if(nameHasDash(createSnippetDTO.name)){
+            logger.warn("Snippet name cannot contain dashes for user: {}, name: {}", userId, createSnippetDTO.name);
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
 		logger.info("Creating snippet for user: {}", userId);
 
 		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(userId,
@@ -241,4 +246,7 @@ public class SnippetServiceImpl implements SnippetService {
 
 		return new ResponseEntity<>("200 OK", HttpStatus.OK);
 	}
+    private boolean nameHasDash(String name) {
+        return name.contains("-");
+    }
 }
