@@ -24,7 +24,7 @@ public class TestCaseService {
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final SnippetRepository snippetRepository;
 
-    // TODO CAMBIAR A 8081
+    // Or 8081
 	private final String printscriptUrl = "http://printscript-service:8084/";
 
     Logger logger = LoggerFactory.getLogger(TestCaseService.class);
