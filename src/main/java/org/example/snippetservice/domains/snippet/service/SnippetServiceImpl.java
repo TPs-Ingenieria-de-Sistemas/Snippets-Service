@@ -14,172 +14,190 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SnippetServiceImpl implements SnippetService {
-    private static final Logger logger = LoggerFactory.getLogger(SnippetServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(SnippetServiceImpl.class);
 
-    private final SnippetRepository snippetRepository;
-    /*    private final RestTemplate restTemplate = new RestTemplate();
-     */
-    // private final String assetServiceUrl = "http://localhost:8080/v1/asset/group-5/";
-    /*private final String assetServiceUrl = "http://asset_service:8080/v1/asset/group-5/";*/
-    /*private final String permitsUrl = "http://snippet-permit:8085/"; // o permits con s??*/
-    private final SnippetPermissionsApi permissionsApi;
-    private final AssetServiceApi assetServiceApi;
+	private final SnippetRepository snippetRepository;
+	/*
+	 * private final RestTemplate restTemplate = new RestTemplate();
+	 */
+	// private final String assetServiceUrl =
+	// "http://localhost:8080/v1/asset/group-5/";
+	/*
+	 * private final String assetServiceUrl =
+	 * "http://asset_service:8080/v1/asset/group-5/";
+	 */
+	/*
+	 * private final String permitsUrl = "http://snippet-permit:8085/"; // o permits
+	 * con s??
+	 */
+	private final SnippetPermissionsApi permissionsApi;
+	private final AssetServiceApi assetServiceApi;
 
-	public SnippetServiceImpl(SnippetRepository snippetRepository, SnippetPermissionsApi permissionsApi, AssetServiceApi assetServiceApi) {
+	public SnippetServiceImpl(SnippetRepository snippetRepository, SnippetPermissionsApi permissionsApi,
+			AssetServiceApi assetServiceApi) {
 		this.snippetRepository = snippetRepository;
-        this.permissionsApi = permissionsApi;
-        this.assetServiceApi = assetServiceApi;
+		this.permissionsApi = permissionsApi;
+		this.assetServiceApi = assetServiceApi;
 	}
 
-    @Override
-    public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating) {
+	@Override
+	public ResponseEntity<SnippetDTO> createSnippet(CreateSnippetDTO createSnippetDTO, Jwt jwt, Boolean isUpdating) {
 
-        logger.info("Creating snippet for user: {}", createSnippetDTO.userId);
+		logger.info("Creating snippet for user: {}", createSnippetDTO.userId);
 
-        Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId, createSnippetDTO.name);
-        if (snippetOptional.isPresent()) {
-            logger.warn("Snippet already exists for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        }
+		Optional<Snippet> snippetOptional = this.snippetRepository.findByUserIdAndName(createSnippetDTO.userId,
+				createSnippetDTO.name);
+		if (snippetOptional.isPresent()) {
+			logger.warn("Snippet already exists for user: {}, name: {}", createSnippetDTO.userId,
+					createSnippetDTO.name);
+			return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+		}
 
-        Snippet snippet = new Snippet();
-        snippet.setUserId(createSnippetDTO.userId);
-        snippet.setName(createSnippetDTO.name);
-        snippet.setContent(createSnippetDTO.content);
-        snippet.setLanguage(createSnippetDTO.language);
+		Snippet snippet = new Snippet();
+		snippet.setUserId(createSnippetDTO.userId);
+		snippet.setName(createSnippetDTO.name);
+		snippet.setContent(createSnippetDTO.content);
+		snippet.setLanguage(createSnippetDTO.language);
 
-        try {
-            logger.info("Storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
-            assetServiceApi.createAsset(createSnippetDTO.userId.toString(), createSnippetDTO.name, createSnippetDTO.content);
-            logger.info("Snippet stored in bucket for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
-        } catch (Exception e) {
-            logger.error("Error storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name, e);
-            snippet.setContent("COULD NOT STORE IN BUCKET");
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+		try {
+			logger.info("Storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId,
+					createSnippetDTO.name);
+			assetServiceApi.createAsset(createSnippetDTO.userId.toString(), createSnippetDTO.name,
+					createSnippetDTO.content);
+			logger.info("Snippet stored in bucket for user: {}, name: {}", createSnippetDTO.userId,
+					createSnippetDTO.name);
+		} catch (Exception e) {
+			logger.error("Error storing snippet in bucket for user: {}, name: {}", createSnippetDTO.userId,
+					createSnippetDTO.name, e);
+			snippet.setContent("COULD NOT STORE IN BUCKET");
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
-        if (!isUpdating) {
-            try {
-                logger.info("Creating permit for snippet: {}", snippet.getName());
-                this.permissionsApi.createPermission(snippet.getName());
-                logger.info("Permit created for snippet: {}", snippet.getName());
-            } catch (Exception e) {
-                logger.error("Error creating permit for snippet: {}", snippet.getName(), e);
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
+		if (!isUpdating) {
+			try {
+				logger.info("Creating permit for snippet: {}", snippet.getName());
+				this.permissionsApi.createPermission(snippet.getName());
+				logger.info("Permit created for snippet: {}", snippet.getName());
+			} catch (Exception e) {
+				logger.error("Error creating permit for snippet: {}", snippet.getName(), e);
+				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}
 
-        this.snippetRepository.save(snippet);
-        logger.info("Snippet saved to database for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
+		this.snippetRepository.save(snippet);
+		logger.info("Snippet saved to database for user: {}, name: {}", createSnippetDTO.userId, createSnippetDTO.name);
 
 		return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.CREATED);
 	}
 
-    @Override
-    public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name, Jwt jwt) {
-        logger.info("Fetching snippet for user: {}, name: {}", userId, name);
+	@Override
+	public ResponseEntity<SnippetDTO> getSnippetByUserIdAndName(String userId, String name, Jwt jwt) {
+		logger.info("Fetching snippet for user: {}, name: {}", userId, name);
 
-        try {
-            Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
-            logger.info("Snippet found in database for user: {}, name: {}", userId, name);
+		try {
+			Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+			logger.info("Snippet found in database for user: {}, name: {}", userId, name);
 
-            try {
-                ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 4);
-                if (Boolean.FALSE.equals(hasPermission.getBody())) {
-                    logger.warn("Permission denied for user: {}, name: {}", userId, name);
-                    return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-                }
-            } catch (Exception e) {
-                logger.error("Error checking permission for user: {}, name: {}", userId, name, e);
-                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-            }
+			try {
+				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 4);
+				if (Boolean.FALSE.equals(hasPermission.getBody())) {
+					logger.warn("Permission denied for user: {}, name: {}", userId, name);
+					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+				}
+			} catch (Exception e) {
+				logger.error("Error checking permission for user: {}, name: {}", userId, name, e);
+				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+			}
 
-            try {
-                assetServiceApi.getAsset(userId, name);
-/*
-                this.restTemplate.getForObject(assetServiceUrl + "snippet-" + userId.toString() + "-" + name, String.class);
-*/
-                return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.OK);
-            } catch (Exception e) {
-                logger.error("Error fetching snippet from bucket for user: {}, name: {}", userId, name, e);
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
+			try {
+				assetServiceApi.getAsset(userId, name);
+				/*
+				 * this.restTemplate.getForObject(assetServiceUrl + "snippet-" +
+				 * userId.toString() + "-" + name, String.class);
+				 */
+				return new ResponseEntity<>(new SnippetDTO(snippet), HttpStatus.OK);
+			} catch (Exception e) {
+				logger.error("Error fetching snippet from bucket for user: {}, name: {}", userId, name, e);
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+	}
 
+	// TODO: Implement delete permits (?) para mí sí
+	@Override
+	public ResponseEntity<String> deleteSnippet(String userId, String name, Jwt jwt) {
+		logger.info("Deleting snippet for user: {}, name: {}", userId, name);
 
-    // TODO: Implement delete permits (?) para mí sí
-    @Override
-    public ResponseEntity<String> deleteSnippet(String userId, String name, Jwt jwt) {
-        logger.info("Deleting snippet for user: {}, name: {}", userId, name);
+		try {
+			Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
 
-        try {
-            Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+			try {
+				assetServiceApi.deleteAsset(userId, name);
+				/*
+				 * this.restTemplate.delete(assetServiceUrl + "snippet-" + userId.toString() +
+				 * "-" + name);
+				 */
+				this.snippetRepository.delete(snippet);
+				logger.info("Snippet deleted for user: {}, name: {}", userId, name);
+			} catch (Exception e) {
+				logger.error("Error deleting snippet for user: {}, name: {}", userId, name, e);
+				return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
+			return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
+		}
 
-            try {
-                assetServiceApi.deleteAsset(userId, name);
-                /*this.restTemplate.delete(assetServiceUrl + "snippet-" + userId.toString() + "-" + name);*/
-                this.snippetRepository.delete(snippet);
-                logger.info("Snippet deleted for user: {}, name: {}", userId, name);
-            } catch (Exception e) {
-                logger.error("Error deleting snippet for user: {}, name: {}", userId, name, e);
-                return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            logger.error("Snippet not found for user: {}, name: {}", userId, name, e);
-            return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
-        }
+		return new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT);
+	}
 
-        return new ResponseEntity<>("204 No Content", HttpStatus.NO_CONTENT);
-    }
+	// TODO: Implement permits? No me parece, pero no estaría de más.
+	@Override
+	public List<SnippetDTO> getUserSnippets(String userId) {
+		logger.info("Fetching snippets for user: {}", userId);
 
+		List<Snippet> snippets = this.snippetRepository.findAllByUserId(userId);
+		List<SnippetDTO> result = new ArrayList<>();
+		for (Snippet snippet : snippets) {
+			result.add(new SnippetDTO(snippet));
+		}
 
-    // TODO: Implement permits? No me parece, pero no estaría de más.
-    @Override
-    public List<SnippetDTO> getUserSnippets(String userId) {
-        logger.info("Fetching snippets for user: {}", userId);
+		logger.info("Fetched {} snippets for user: {}", result.size(), userId);
+		return result;
+	}
 
-        List<Snippet> snippets = this.snippetRepository.findAllByUserId(userId);
-        List<SnippetDTO> result = new ArrayList<>();
-        for (Snippet snippet : snippets) {
-            result.add(new SnippetDTO(snippet));
-        }
+	@Override
+	public ResponseEntity<SnippetDTO> updateSnippet(String userId, String name, String newName, String content,
+			Jwt jwt) {
+		logger.info("Updating snippet for user: {}, name: {}", userId, name);
 
-        logger.info("Fetched {} snippets for user: {}", result.size(), userId);
-        return result;
-    }
+		try {
+			SnippetDTO oldContent = this.getSnippetByUserIdAndName(userId, name, jwt).getBody();
+			if (oldContent == null) {
+				logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
+				return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+			}
 
-    @Override
-    public ResponseEntity<SnippetDTO> updateSnippet(String userId, String name, String newName, String content, Jwt jwt) {
-        logger.info("Updating snippet for user: {}, name: {}", userId, name);
+			try {
+				ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 2);
+				if (Boolean.FALSE.equals(hasPermission.getBody())) {
+					logger.warn("Permission denied for updating snippet, user: {}, name: {}", userId, name);
+					return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+				}
+			} catch (Exception e) {
+				logger.error("Error checking permission for updating snippet, user: {}, name: {}", userId, name, e);
+				return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
+			}
 
-        try {
-            SnippetDTO oldContent = this.getSnippetByUserIdAndName(userId, name, jwt).getBody();
-            if (oldContent == null) {
-                logger.warn("Snippet not found for update, user: {}, name: {}", userId, name);
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            }
-
-            try {
-                ResponseEntity<Boolean> hasPermission = this.permissionsApi.hasPermission(name, 2);
-                if (Boolean.FALSE.equals(hasPermission.getBody())) {
-                    logger.warn("Permission denied for updating snippet, user: {}, name: {}", userId, name);
-                    return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-                }
-            } catch (Exception e) {
-                logger.error("Error checking permission for updating snippet, user: {}, name: {}", userId, name, e);
-                return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-            }
-
-            this.deleteSnippet(userId, name, jwt);
+			this.deleteSnippet(userId, name, jwt);
 
 			CreateSnippetDTO createSnippetDTO = new CreateSnippetDTO();
 			createSnippetDTO.userId = userId;
@@ -187,35 +205,35 @@ public class SnippetServiceImpl implements SnippetService {
 			createSnippetDTO.content = oldContent.content;
 			createSnippetDTO.language = oldContent.language;
 
-            if (newName != null) {
-                createSnippetDTO.name = newName;
-            }
-            if (content != null) {
-                createSnippetDTO.content = content;
-            }
+			if (newName != null) {
+				createSnippetDTO.name = newName;
+			}
+			if (content != null) {
+				createSnippetDTO.content = content;
+			}
 
-            return this.createSnippet(createSnippetDTO, jwt,true);
-        } catch (Exception e) {
-            logger.error("Error updating snippet for user: {}, name: {}", userId, name, e);
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
+			return this.createSnippet(createSnippetDTO, jwt, true);
+		} catch (Exception e) {
+			logger.error("Error updating snippet for user: {}, name: {}", userId, name, e);
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @Override
-    public ResponseEntity<String> updateSnippetStatus(String userId, String name, SnippetStatus status) {
-        logger.info("Updating snippet status for user: {}, name: {}", userId, name);
+	@Override
+	public ResponseEntity<String> updateSnippetStatus(String userId, String name, SnippetStatus status) {
+		logger.info("Updating snippet status for user: {}, name: {}", userId, name);
 
-        try {
-            Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
-            snippet.setStatus(status);
-            this.snippetRepository.save(snippet);
+		try {
+			Snippet snippet = this.snippetRepository.findByUserIdAndName(userId, name).orElseThrow();
+			snippet.setStatus(status);
+			this.snippetRepository.save(snippet);
 
-            logger.info("Snippet status updated for user: {}, name: {}", userId, name);
-        } catch (Exception e) {
-            logger.error("Error updating snippet status for user: {}, name: {}", userId, name, e);
-            return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
-        }
+			logger.info("Snippet status updated for user: {}, name: {}", userId, name);
+		} catch (Exception e) {
+			logger.error("Error updating snippet status for user: {}, name: {}", userId, name, e);
+			return new ResponseEntity<>("404 Not Found", HttpStatus.NOT_FOUND);
+		}
 
-        return new ResponseEntity<>("200 OK", HttpStatus.OK);
-    }
+		return new ResponseEntity<>("200 OK", HttpStatus.OK);
+	}
 }

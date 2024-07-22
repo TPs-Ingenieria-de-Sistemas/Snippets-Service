@@ -8,16 +8,16 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class AssetServiceConfig {
 
-    @Value("${assetService}")
-    private String assetsServiceUrl;
+	@Value("${assetService}")
+	private String assetsServiceUrl;
 
-    @Bean
-    public RestTemplate restTemplate1() {
-        return new RestTemplate();
-    }
+	@Bean
+	public RestTemplate restTemplate1() {
+		return new RestTemplate();
+	}
 
-    @Bean
-    public AssetServiceApi createAssetServiceApi(RestTemplate restTemplate) {
-        return new AssetServiceImpl(assetsServiceUrl, restTemplate);
-    }
+	@Bean
+	public AssetServiceApi createAssetServiceApi(RestTemplate restTemplate) {
+		return new AssetServiceImpl(assetsServiceUrl, restTemplate);
+	}
 }
